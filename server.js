@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const session = require('express-session');
 require('dotenv').config();
+const { testConnection } = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,6 +53,8 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
     res.status(404).json({ message: 'Route not found' });
 });
+
+testConnection();
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
