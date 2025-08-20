@@ -5,18 +5,22 @@ const { pool } = require('../config/database');
 
 const router = express.Router();
 
-// Register route (for development/testing)
+// Register route 
 router.post('/register', async (req, res) => {
+    const client = await pool.connect();
+    
     try {
+        await client.query('BEGIN');
+        
         const { username, email, password, user_type, first_name, last_name, student_id } = req.body;
 
         // Check if user already exists
-        const [existingUsers] = await pool.execute(
-            'SELECT id FROM users WHERE username = ? OR email = ?',
+        const existingUser = await client.query(
+            'SELECT id FROM users WHERE username = $1 OR email = $2',
             [username, email]
         );
 
-        if (existingUsers.length > 0) {
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
@@ -24,52 +28,57 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert user
-        const [result] = await pool.execute(
-            'INSERT INTO users (username, email, password, user_type, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)',
+        const userResult = await client.query(
+            'INSERT INTO users (username, email, password_hash, user_type, first_name, last_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
             [username, email, hashedPassword, user_type, first_name, last_name]
         );
 
-        const userId = result.insertId;
+        const userId = userResult.rows[0].id;
 
         // Insert into specific table based on user type
         if (user_type === 'student') {
-            await pool.execute(
-                'INSERT INTO students (user_id, student_id) VALUES (?, ?)',
+            await client.query(
+                'INSERT INTO students (user_id, student_id) VALUES ($1, $2)',
                 [userId, student_id]
             );
         } else if (user_type === 'professor') {
-            await pool.execute(
-                'INSERT INTO professors (user_id) VALUES (?)',
+            await client.query(
+                'INSERT INTO professors (user_id) VALUES ($1)',
                 [userId]
             );
         }
 
+        await client.query('COMMIT');
         res.status(201).json({ message: 'User registered successfully' });
+        
     } catch (error) {
+        await client.query('ROLLBACK');
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Registration failed' });
+    } finally {
+        client.release();
     }
 });
 
-// Login route
+// Login route 
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
 
         // Find user
-        const [users] = await pool.execute(
-            'SELECT id, username, email, password, user_type, first_name, last_name FROM users WHERE username = ?',
+        const result = await pool.query(
+            'SELECT id, username, email, password_hash, user_type, first_name, last_name FROM users WHERE username = $1',
             [username]
         );
 
-        if (users.length === 0) {
+        if (result.rows.length === 0) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const user = users[0];
+        const user = result.rows[0];
 
         // Check password
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const isValidPassword = await bcrypt.compare(password, user.password_hash);
         if (!isValidPassword) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -108,7 +117,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Logout route
+// Logout route 
 router.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -119,23 +128,23 @@ router.post('/logout', (req, res) => {
     });
 });
 
-// Check authentication status
+// Check authentication status 
 router.get('/me', async (req, res) => {
     try {
         if (!req.session.userId) {
             return res.status(401).json({ message: 'Not authenticated' });
         }
 
-        const [users] = await pool.execute(
-            'SELECT id, username, email, user_type, first_name, last_name FROM users WHERE id = ?',
+        const result = await pool.query(
+            'SELECT id, username, email, user_type, first_name, last_name FROM users WHERE id = $1',
             [req.session.userId]
         );
 
-        if (users.length === 0) {
+        if (result.rows.length === 0) {
             return res.status(401).json({ message: 'User not found' });
         }
 
-        res.json({ user: users[0] });
+        res.json({ user: result.rows[0] });
     } catch (error) {
         console.error('Auth check error:', error);
         res.status(500).json({ message: 'Authentication check failed' });
