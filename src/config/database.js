@@ -1,17 +1,13 @@
-const mysql = require('mysql2');
-require('dotenv').config();
+const { Pool } = require('pg');  
 
-// Create connection pool
-const pool = mysql.createPool({
+const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'thesis_management',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    acquireTimeout: 60000,
-    timeout: 60000
+    port: process.env.DB_PORT || 5432,
+    max: 10,  // maximum number of clients in the pool
+    idleTimeoutMillis: 30000,
 });
 
 // Create promise-based connection
