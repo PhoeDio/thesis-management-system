@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Φοιτητής - Dashboard | Thesis Management</title>
+    <style>
+        /* Reset και βασικά styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active { background: #d4edda; color: #155724; }
+        .status-under-assignment { background: #fff3cd; color: #856404; }
+        .status-under-examination { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Info List */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .info-value {
+            color: #2d3748;
+        }
+
+        /* Committee Members */
+        .committee-member {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .member-role {
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: capitalize;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .committee-member {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .container {
+                margin: 1rem auto;
+                padding: 0 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .info-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles για accessibility */
+        .btn:focus,
+        .logout-btn:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                🎓 Thesis Management System
+            </div>
+            <div class="user-info">
+                <span class="user-name" id="userName">Φόρτωση...</span>
+                <button class="logout-btn" onclick="logout()">
+                    Αποσύνδεση
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Current Thesis Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Διπλωματική Εργασία</h2>
+                </div>
+                <div id="thesisContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Φόρτωση...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Profile Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👤</div>
+                    <h2 class="card-title">Προφίλ Φοιτητή</h2>
+                </div>
+                <div id="profileContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Φόρτωση...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Committee Members Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👥</div>
+                    <h2 class="card-title">Τριμελής Επιτροπή</h2>
+                </div>
+                <div id="committeeContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Φόρτωση...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <h2 class="card-title">Ενέργειες</h2>
+                </div>
+                <div id="actionsContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Φόρτωση...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let thesisData = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // Check authentication
+                const authResponse = await fetch('/api/auth/me');
+                if (!authResponse.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                currentUser = await authResponse.json();
+                document.getElementById('userName').textContent = 
+                    `${currentUser.user.first_name} ${currentUser.user.last_name}`;
+
+                // Load student dashboard data
+                const dashboardResponse = await fetch('/api/student/dashboard');
+                if (dashboardResponse.ok) {
+                    const dashboardData = await dashboardResponse.json();
+                    renderDashboard(dashboardData);
+                } else {
+                    showError('Σφάλμα φόρτωσης δεδομένων');
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                showError('Σφάλμα σύνδεσης');
+            }
+        }
+
+        // Render dashboard content
+        function renderDashboard(data) {
+            thesisData = data.current_thesis;
+            
+            renderThesisInfo(data.current_thesis);
+            renderProfileInfo(data.student);
+            renderCommitteeInfo(data.committee_members);
+            renderActions(data.current_thesis);
+        }
+
+        // Render thesis information
+        function renderThesisInfo(thesis) {
+            const content = document.getElementById('thesisContent');
+            
+            if (!thesis) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>Δεν έχετε εκχωρημένη διπλωματική εργασία</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusText = getStatusText(thesis.status);
+            const statusClass = `status-${thesis.status.replace('_', '-')}`;
+
+            content.innerHTML = `
+                <ul class="info-list">
+                    <li>
+                        <span class="info-label">Τίτλος:</span>
+                        <span class="info-value">${thesis.title}</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Κατάσταση:</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Επιβλέπων:</span>
+                        <span class="info-value">${thesis.supervisor_name}</span>
+                    </li>
+                    ${thesis.assigned_at ? `
+                    <li>
+                        <span class="info-label">Ημ. Ανάθεσης:</span>
+                        <span class="info-value">${formatDate(thesis.assigned_at)}</span>
+                    </li>
+                    ` : ''}
+                    ${thesis.final_grade ? `
+                    <li>
+                        <span class="info-label">Τελικός Βαθμός:</span>
+                        <span class="info-value">${thesis.final_grade}/10</span>
+                    </li>
+                    ` : ''}
+                </ul>
+                ${thesis.description ? `
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f2f5;">
+                        <strong>Περιγραφή:</strong>
+                        <p style="margin-top: 0.5rem; color: #6c757d;">${thesis.description}</p>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Render profile information
+        function renderProfileInfo(student) {
+            const content = document.getElementById('profileContent');
+            
+            content.innerHTML = `
+                <ul class="info-list">
+                    <li>
+                        <span class="info-label">Όνομα:</span>
+                        <span class="info-value">${student.name}</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Α.Μ.:</span>
+                        <span class="info-value">${student.student_number}</span>
+                    </li>
+                    <li>
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">${student.email}</span>
+                    </li>
+                    ${student.phone_mobile ? `
+                    <li>
+                        <span class="info-label">Κινητό:</span>
+                        <span class="info-value">${student.phone_mobile}</span>
+                    </li>
+                    ` : ''}
+                    ${student.address ? `
+                    <li>
+                        <span class="info-label">Διεύθυνση:</span>
+                        <span class="info-value">${student.address}</span>
+                    </li>
+                    ` : ''}
+                </ul>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-secondary" onclick="editProfile()">
+                        Επεξεργασία Προφίλ
+                    </button>
+                </div>
+            `;
+        }
+
+        // Render committee information
+        function renderCommitteeInfo(members) {
+            const content = document.getElementById('committeeContent');
+            
+            if (!members || members.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <p>Δεν έχουν οριστεί μέλη επιτροπής</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const membersHtml = members.map(member => `
+                <div class="committee-member">
+                    <div class="member-info">
+                        <div class="member-name">${member.professor_name}</div>
+                        <div class="member-role">${getRoleText(member.role)}</div>
+                        ${member.specialization ? `<div style="font-size: 0.8rem; color: #8e9ba7;">${member.specialization}</div>` : ''}
+                    </div>
+                    <span class="status-badge ${getStatusClass(member.status)}">${getInvitationStatusText(member.status)}</span>
+                </div>
+            `).join('');
+
+            content.innerHTML = membersHtml;
+        }
+
+        // Render available actions
+        function renderActions(thesis) {
+            const content = document.getElementById('actionsContent');
+            
+            if (!thesis) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚙️</div>
+                        <p>Δεν υπάρχουν διαθέσιμες ενέργειες</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let actions = [];
+
+            // Actions based on thesis status
+            switch (thesis.status) {
+                case 'under_assignment':
+                    actions.push({
+                        text: 'Πρόσκληση Μελών Επιτροπής',
+                        action: 'inviteCommittee()',
+                        class: 'btn'
+                    });
+                    break;
+                    
+                case 'active':
+                    actions.push({
+                        text: 'Προβολή Λεπτομερειών',
+                        action: 'viewThesisDetails()',
+                        class: 'btn'
+                    });
+                    break;
+                    
+                case 'under_examination':
+                    actions.push({
+                        text: 'Ανέβασμα Αρχείων',
+                        action: 'uploadFiles()',
+                        class: 'btn'
+                    });
+                    actions.push({
+                        text: 'Καταχώρηση Παρουσίασης',
+                        action: 'schedulePresentation()',
+                        class: 'btn btn-secondary'
+                    });
+                    break;
+                    
+                case 'completed':
+                    actions.push({
+                        text: 'Προβολή Πρακτικού',
+                        action: 'viewReport()',
+                        class: 'btn'
+                    });
+                    break;
+            }
+
+            // Always available actions
+            actions.push({
+                text: 'Λεπτομέρειες Διπλωματικής',
+                action: 'viewThesisDetails()',
+                class: 'btn btn-secondary'
+            });
+
+            const actionsHtml = actions.map(action => `
+                <button class="${action.class}" onclick="${action.action}" style="margin-bottom: 0.5rem; width: 100%;">
+                    ${action.text}
+                </button>
+            `).join('');
+
+            content.innerHTML = actionsHtml;
+        }
+
+        // Utility functions
+        function getStatusText(status) {
+            const statusMap = {
+                'under_assignment': 'Υπό Ανάθεση',
+                'active': 'Ενεργή',
+                'under_examination': 'Υπό Εξέταση',
+                'completed': 'Ολοκληρωμένη',
+                'cancelled': 'Ακυρωμένη'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getRoleText(role) {
+            const roleMap = {
+                'supervisor': 'Επιβλέπων',
+                'member': 'Μέλος'
+            };
+            return roleMap[role] || role;
+        }
+
+        function getInvitationStatusText(status) {
+            const statusMap = {
+                'pending': 'Εκκρεμής',
+                'accepted': 'Αποδεκτή',
+                'rejected': 'Απορρίφθηκε'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classMap = {
+                'pending': 'status-under-assignment',
+                'accepted': 'status-active',
+                'rejected': 'status-cancelled'
+            };
+            return classMap[status] || 'status-under-assignment';
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('el-GR');
+        }
+
+        function showError(message) {
+            // Simple error display - μπορείτε να το βελτιώσετε
+            alert(message);
+        }
+
+        // Action functions (placeholders)
+        function logout() {
+            fetch('/api/auth/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/login.html';
+                })
+                .catch(console.error);
+        }
+
+        function editProfile() {
+            alert('Επεξεργασία προφίλ - θα υλοποιηθεί στο επόμενο βήμα!');
+        }
+
+        function inviteCommittee() {
+            alert('Πρόσκληση μελών επιτροπής - θα υλοποιηθεί!');
+        }
+
+        function viewThesisDetails() {
+            alert('Λεπτομέρειες διπλωματικής - θα υλοποιηθεί!');
+        }
+
+        function uploadFiles() {
+            alert('Ανέβασμα αρχείων - θα υλοποιηθεί!');
+        }
+
+        function schedulePresentation() {
+            alert('Καταχώρηση παρουσίασης - θα υλοποιηθεί!');
+        }
+
+        function viewReport() {
+            alert('Προβολή πρακτικού - θα υλοποιηθεί!');
+        }
+    </script>
+</body>
+</html>
