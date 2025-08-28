@@ -45,17 +45,19 @@ function safeRequire(modulePath, fallbackMessage) {
 }
 
 // Routes με safe loading
-const authRoutes = require('./src/routes/auth'); // Αυτό υπάρχει ήδη
+const authRoutes = require('./src/routes/auth'); 
 const professorRoutes = safeRequire('./src/routes/professor', 'Professor routes not found');
 const studentRoutes = safeRequire('./src/routes/student', 'Student routes not found');
 const secretaryRoutes = safeRequire('./src/routes/secretary', 'Secretary routes not found');
 const publicRoutes = safeRequire('./src/routes/public', 'Public routes not found');
+const committeeRoutes = safeRequire('./src/routes/committeeRoute', 'Committee routes not found');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/secretary', secretaryRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/committee', committeeRoutes); 
 
 // Serve main page
 app.get('/', (req, res) => {
