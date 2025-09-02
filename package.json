@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+<<<<<<< HEAD
   "keywords": [
     "thesis",
     "management",
@@ -28,6 +29,22 @@
   },
   "devDependencies": {
     "axios": "^1.11.0",
+=======
+  "keywords": ["thesis", "management", "university", "express"],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.6.3",
+    "multer": "^2.0.2",
+    "express-session": "^1.17.3"
+  },
+  "devDependencies": {
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6
     "nodemon": "^3.0.2"
   }
 }

@@ -213,4 +213,8 @@ module.exports = {
     getCurrentUserProfile,
     logout,
     debugAuth
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6

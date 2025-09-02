@@ -256,4 +256,8 @@ router.get('/statistics', requireAuth, requireRole(['secretary']), async (req, r
 // Import pool for database queries (should be at top, but added here for clarity)
 const { pool } = require('../config/database');
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6

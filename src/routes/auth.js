@@ -282,4 +282,8 @@ router.get('/status', (req, res) => {
     });
 });
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6

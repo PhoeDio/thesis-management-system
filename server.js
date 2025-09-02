@@ -51,7 +51,10 @@ const studentRoutes = safeRequire('./src/routes/student', 'Student routes not fo
 const secretaryRoutes = safeRequire('./src/routes/secretary', 'Secretary routes not found');
 const publicRoutes = safeRequire('./src/routes/public', 'Public routes not found');
 const committeeRoutes = safeRequire('./src/routes/committeeRoute', 'Committee routes not found');
+<<<<<<< HEAD
 const fileRoutes = safeRequire('./src/routes/files', 'File routes not found');
+=======
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6
 
 app.use('/api/auth', authRoutes);
 app.use('/api/professor', professorRoutes);
@@ -59,7 +62,10 @@ app.use('/api/student', studentRoutes);
 app.use('/api/secretary', secretaryRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/committee', committeeRoutes); 
+<<<<<<< HEAD
 app.use('/api/files', fileRoutes);
+=======
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6
 
 // Serve main page
 app.get('/', (req, res) => {
@@ -224,4 +230,8 @@ app.listen(PORT, () => {
     console.log('💡 Ready for development!\n');
 });
 
+<<<<<<< HEAD
 module.exports = app;
+=======
+module.exports = app;
+>>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6
