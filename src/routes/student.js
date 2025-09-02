@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // src/routes/student.js - Routes για φοιτητές
 const express = require('express');
 const { pool } = require('../config/database');
@@ -326,13 +326,13 @@ router.get('/available-professors', async (req, res) => {
     }
 });
 
-=======
+
 // src/routes/student.js - Routes για φοιτητές
 const express = require('express');
 const { pool } = require('../config/database');
 const { requireAuth, requireStudent, getCurrentUserProfile } = require('../middleware/auth');
 
-const router = express.Router();
+
 
 // Middleware για όλα τα student routes
 router.use(requireAuth);
@@ -654,5 +654,4 @@ router.get('/available-professors', async (req, res) => {
     }
 });
 
->>>>>>> 9745299ff62c6b661783167c3511c9775ecf91c6
 module.exports = router;
