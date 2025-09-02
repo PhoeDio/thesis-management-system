@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        #userInfo {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Thesis Management System - Auth Test</h1>
+        
+        <!-- Login Section -->
+        <div class="section">
+            <h2>📝 Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" value="prof_smith" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" value="password123" required>
+                </div>
+                <button type="submit">🔐 Login</button>
+            </form>
+            <div id="loginResult"></div>
+        </div>
+
+        <!-- Registration Section -->
+        <div class="section">
+            <h2>📋 Register New User</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">Username:</label>
+                    <input type="text" id="regUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="regUserType">User Type:</label>
+                    <select id="regUserType" required onchange="toggleStudentFields()">
+                        <option value="">Select Type</option>
+                        <option value="professor">Professor</option>
+                        <option value="student">Student</option>
+                        <option value="secretary">Secretary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regFirstName">First Name:</label>
+                    <input type="text" id="regFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="regLastName">Last Name:</label>
+                    <input type="text" id="regLastName" required>
+                </div>
+                <div class="form-group hidden" id="studentIdGroup">
+                    <label for="regStudentId">Student ID:</label>
+                    <input type="text" id="regStudentId">
+                </div>
+                <div class="form-group hidden" id="professorFields">
+                    <label for="regSpecialization">Specialization:</label>
+                    <input type="text" id="regSpecialization">
+                    <label for="regOffice">Office Location:</label>
+                    <input type="text" id="regOffice">
+                </div>
+                <button type="submit">📝 Register</button>
+            </form>
+            <div id="registerResult"></div>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="section">
+            <h2>👤 Current User Info</h2>
+            <button onclick="getCurrentUser()">🔍 Get My Info</button>
+            <button onclick="logout()">🚪 Logout</button>
+            <div id="userInfo"></div>
+        </div>
+
+        <!-- API Test Section -->
+        <div class="section">
+            <h2>🧪 API Tests</h2>
+            <button onclick="testAuthStatus()">📊 Check Auth Status</button>
+            <button onclick="testProtectedRoute()">🔒 Test Protected Route</button>
+            <div id="testResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentToken = localStorage.getItem('authToken');
+
+        // Toggle student-specific fields
+        function toggleStudentFields() {
+            const userType = document.getElementById('regUserType').value;
+            const studentGroup = document.getElementById('studentIdGroup');
+            const professorGroup = document.getElementById('professorFields');
+            
+            if (userType === 'student') {
+                studentGroup.classList.remove('hidden');
+                professorGroup.classList.add('hidden');
+            } else if (userType === 'professor') {
+                studentGroup.classList.add('hidden');
+                professorGroup.classList.remove('hidden');
+            } else {
+                studentGroup.classList.add('hidden');
+                professorGroup.classList.add('hidden');
+            }
+        }
+
+        // Display result helper
+        function displayResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            const className = isError ? 'error' : 'success';
+            element.innerHTML = `
+                <div class="${className}">
+                    <strong>${isError ? '❌ Error:' : '✅ Success:'}</strong>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = data.token;
+                    localStorage.setItem('authToken', currentToken);
+                    displayResult('loginResult', data);
+                } else {
+                    displayResult('loginResult', data, true);
+                }
+            } catch (error) {
+                displayResult('loginResult', { message: error.message }, true);
+            }
+        });
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                user_type: document.getElementById('regUserType').value,
+                first_name: document.getElementById('regFirstName').value,
+                last_name: document.getElementById('regLastName').value
+            };
+
+            // Add user-type specific fields
+            if (formData.user_type === 'student') {
+                formData.student_id = document.getElementById('regStudentId').value;
+            } else if (formData.user_type === 'professor') {
+                formData.specialization = document.getElementById('regSpecialization').value;
+                formData.office_location = document.getElementById('regOffice').value;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                displayResult('registerResult', data, !response.ok);
+            } catch (error) {
+                displayResult('registerResult', { message: error.message }, true);
+            }
+        });
+
+        // Get current user info
+        async function getCurrentUser() {
+            if (!currentToken) {
+                displayResult('userInfo', { message: 'Please login first' }, true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                displayResult('userInfo', data, !response.ok);
+            } catch (error) {
+                displayResult('userInfo', { message: error.message }, true);
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/logout`, {
+                    method: 'POST',
+                    headers: currentToken ? {
+                        'Authorization': `Bearer ${currentToken}`
+                    } : {}
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentToken = null;
+                    localStorage.removeItem('authToken');
+                    displayResult('userInfo', data);
+                } else {
+                    displayResult('userInfo', data, true);
+                }
+            } catch (error) {
+                displayResult('userInfo', { message: error.message }, true);
+            }
+        }
+
+        // Test auth status
+        async function testAuthStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/status`);
+                const data = await response.json();
+                displayResult('testResults', data);
+            } catch (error) {
+                displayResult('testResults', { message: error.message }, true);
+            }
+        }
+
+        // Test protected route
+        async function testProtectedRoute() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: currentToken ? {
+                        'Authorization': `Bearer ${currentToken}`
+                    } : {}
+                });
+                
+                const data = await response.json();
+                displayResult('testResults', {
+                    status: response.status,
+                    hasToken: !!currentToken,
+                    response: data
+                }, !response.ok);
+            } catch (error) {
+                displayResult('testResults', { message: error.message }, true);
+            }
+        }
+
+        // Load saved token on page load
+        if (currentToken) {
+            getCurrentUser();
+        }
+    </script>
+</body>
+</html>
