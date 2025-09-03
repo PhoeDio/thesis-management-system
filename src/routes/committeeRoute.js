@@ -1,8 +1,11 @@
+
+
 // src/routes/committeeRoutes.js
 // Express routes for committee management functionality
 
 const express = require('express');
 const router = express.Router();
+const { pool } = require('../config/database');
 const committeeService = require('../services/committeeService');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
@@ -253,8 +256,6 @@ router.get('/statistics', requireAuth, requireRole(['secretary']), async (req, r
     }
 });
 
-// Import pool for database queries (should be at top, but added here for clarity)
-const { pool } = require('../config/database');
 
 module.exports = router;
 
