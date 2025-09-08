@@ -262,4 +262,229 @@ router.get('/statistics', async (req, res) => {
     }
 });
 
+
+/**
+ * 📝 GET /api/professor/supervised-theses - Get all supervised theses (for file management)
+ */
+router.get('/supervised-theses', async (req, res) => {
+    try {
+        const professorId = req.userProfile.professor_id;
+        
+        const theses = await pool.query(`
+            SELECT 
+                tw.id,
+                tt.title,
+                tw.status,
+                tw.assigned_at,
+                tw.updated_at,
+                CONCAT(u.first_name, ' ', u.last_name) as student_name,
+                s.student_id as student_number,
+                u.email as student_email
+            FROM thesis_works tw
+            JOIN thesis_topics tt ON tw.topic_id = tt.id
+            JOIN students st ON tw.student_id = st.id
+            JOIN users u ON st.user_id = u.id
+            JOIN students s ON st.id = s.id
+            WHERE tw.supervisor_id = $1
+            ORDER BY tw.updated_at DESC
+        `, [professorId]);
+        
+        res.json({
+            success: true,
+            theses: theses.rows
+        });
+        
+    } catch (error) {
+        console.error('Supervised theses error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to load supervised theses'
+        });
+    }
+});
+
+
+/**
+ * 🔄 PUT /api/professor/thesis/:id/activate - Activate thesis
+ */
+router.put('/thesis/:id/activate', async (req, res) => {
+    try {
+        const thesisId = req.params.id;
+        const professorId = req.userProfile.professor_id;
+        const { reason } = req.body;
+
+        // Verify professor supervises this thesis and it's under_assignment
+        const thesis = await pool.query(`
+            SELECT id, status FROM thesis_works 
+            WHERE id = $1 AND supervisor_id = $2 AND status = 'under_assignment'
+        `, [thesisId, professorId]);
+
+        if (thesis.rows.length === 0) {
+            return res.status(404).json({ 
+                message: 'Thesis not found or cannot be activated' 
+            });
+        }
+
+        // Update thesis status
+        await pool.query(`
+            UPDATE thesis_works 
+            SET status = 'active', activated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+        `, [thesisId]);
+
+        // Record status change
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, 'under_assignment', 'active', $2, $3)
+        `, [thesisId, req.session.user.id, reason || 'Thesis activated by supervisor']);
+
+        res.json({ message: 'Thesis activated successfully' });
+
+    } catch (error) {
+        console.error('Activate thesis error:', error);
+        res.status(500).json({ message: 'Failed to activate thesis' });
+    }
+});
+
+/**
+ * 🔄 PUT /api/professor/thesis/:id/start-examination - Start examination
+ */
+router.put('/thesis/:id/start-examination', async (req, res) => {
+    try {
+        const thesisId = req.params.id;
+        const professorId = req.userProfile.professor_id;
+        const { reason } = req.body;
+
+        // Verify professor supervises this thesis and it's active
+        const thesis = await pool.query(`
+            SELECT id, status FROM thesis_works 
+            WHERE id = $1 AND supervisor_id = $2 AND status = 'active'
+        `, [thesisId, professorId]);
+
+        if (thesis.rows.length === 0) {
+            return res.status(404).json({ 
+                message: 'Thesis not found or cannot start examination' 
+            });
+        }
+
+        // Update thesis status
+        await pool.query(`
+            UPDATE thesis_works 
+            SET status = 'under_examination', examination_started_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+        `, [thesisId]);
+
+        // Record status change
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, 'active', 'under_examination', $2, $3)
+        `, [thesisId, req.session.user.id, reason || 'Examination started by supervisor']);
+
+        res.json({ message: 'Examination started successfully' });
+
+    } catch (error) {
+        console.error('Start examination error:', error);
+        res.status(500).json({ message: 'Failed to start examination' });
+    }
+});
+
+/**
+ * 🔄 PUT /api/professor/thesis/:id/complete - Complete thesis
+ */
+router.put('/thesis/:id/complete', async (req, res) => {
+    try {
+        const thesisId = req.params.id;
+        const professorId = req.userProfile.professor_id;
+        const { final_grade, general_assembly_number, general_assembly_year, reason } = req.body;
+
+        // Verify professor supervises this thesis and it's under_examination
+        const thesis = await pool.query(`
+            SELECT id, status FROM thesis_works 
+            WHERE id = $1 AND supervisor_id = $2 AND status = 'under_examination'
+        `, [thesisId, professorId]);
+
+        if (thesis.rows.length === 0) {
+            return res.status(404).json({ 
+                message: 'Thesis not found or cannot be completed' 
+            });
+        }
+
+        // Update thesis status
+        await pool.query(`
+            UPDATE thesis_works 
+            SET status = 'completed', 
+                completed_at = CURRENT_TIMESTAMP, 
+                final_grade = $2,
+                general_assembly_number = $3,
+                general_assembly_year = $4,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+        `, [thesisId, final_grade, general_assembly_number, general_assembly_year]);
+
+        // Record status change
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, 'under_examination', 'completed', $2, $3)
+        `, [thesisId, req.session.user.id, reason || 'Thesis completed successfully']);
+
+        res.json({ message: 'Thesis completed successfully' });
+
+    } catch (error) {
+        console.error('Complete thesis error:', error);
+        res.status(500).json({ message: 'Failed to complete thesis' });
+    }
+});
+
+/**
+ * 🔄 PUT /api/professor/thesis/:id/cancel - Cancel thesis
+ */
+router.put('/thesis/:id/cancel', async (req, res) => {
+    try {
+        const thesisId = req.params.id;
+        const professorId = req.userProfile.professor_id;
+        const { cancellation_reason } = req.body;
+
+        if (!cancellation_reason) {
+            return res.status(400).json({ message: 'Cancellation reason is required' });
+        }
+
+        // Verify professor supervises this thesis and it's not already completed
+        const thesis = await pool.query(`
+            SELECT id, status FROM thesis_works 
+            WHERE id = $1 AND supervisor_id = $2 AND status NOT IN ('completed', 'cancelled')
+        `, [thesisId, professorId]);
+
+        if (thesis.rows.length === 0) {
+            return res.status(404).json({ 
+                message: 'Thesis not found or cannot be cancelled' 
+            });
+        }
+
+        const currentStatus = thesis.rows[0].status;
+
+        // Update thesis status
+        await pool.query(`
+            UPDATE thesis_works 
+            SET status = 'cancelled', 
+                cancelled_at = CURRENT_TIMESTAMP,
+                cancelled_by = 'professor',
+                cancellation_reason = $2,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+        `, [thesisId, cancellation_reason]);
+
+        // Record status change
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, $2, 'cancelled', $3, $4)
+        `, [thesisId, currentStatus, req.session.user.id, cancellation_reason]);
+
+        res.json({ message: 'Thesis cancelled successfully' });
+
+    } catch (error) {
+        console.error('Cancel thesis error:', error);
+        res.status(500).json({ message: 'Failed to cancel thesis' });
+    }
+});
+
 module.exports = router;

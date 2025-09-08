@@ -654,4 +654,73 @@ router.get('/available-professors', async (req, res) => {
     }
 });
 
+
+/**
+ * 🔄 PUT /api/student/thesis/request-examination - Request examination
+ */
+router.put('/thesis/request-examination', async (req, res) => {
+    try {
+        const studentId = req.userProfile.student_id;
+        
+        // Find student's active thesis
+        const thesis = await pool.query(`
+            SELECT id, status, supervisor_id 
+            FROM thesis_works 
+            WHERE student_id = $1 AND status = 'active'
+        `, [studentId]);
+
+        if (thesis.rows.length === 0) {
+            return res.status(404).json({ 
+                message: 'No active thesis found for examination request' 
+            });
+        }
+
+        // Create a status change request (for professor approval)
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, 'active', 'under_examination', $2, 'Student requested examination')
+        `, [thesis.rows[0].id, req.session.user.id]);
+
+        res.json({ 
+            message: 'Examination request submitted successfully',
+            thesis_id: thesis.rows[0].id 
+        });
+
+    } catch (error) {
+        console.error('Request examination error:', error);
+        res.status(500).json({ message: 'Failed to submit examination request' });
+    }
+});
+
+/**
+ * 📊 GET /api/student/thesis/status-history - Get thesis status history
+ */
+router.get('/thesis/status-history', async (req, res) => {
+    try {
+        const studentId = req.userProfile.student_id;
+        
+        // Get status history for student's thesis
+        const history = await pool.query(`
+            SELECT 
+                tsh.from_status,
+                tsh.to_status,
+                tsh.change_reason,
+                tsh.changed_at,
+                CONCAT(u.first_name, ' ', u.last_name) as changed_by_name,
+                u.user_type as changed_by_type
+            FROM thesis_status_history tsh
+            JOIN thesis_works tw ON tsh.thesis_id = tw.id
+            LEFT JOIN users u ON tsh.changed_by = u.id
+            WHERE tw.student_id = $1
+            ORDER BY tsh.changed_at DESC
+        `, [studentId]);
+
+        res.json({ status_history: history.rows });
+
+    } catch (error) {
+        console.error('Get status history error:', error);
+        res.status(500).json({ message: 'Failed to load status history' });
+    }
+});
+
 module.exports = router;
