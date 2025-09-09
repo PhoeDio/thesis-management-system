@@ -774,10 +774,591 @@
             loading: false
         };
 
+        // File Upload Component - Add this to your dashboard JavaScript files
+        // This component handles file upload functionality for thesis documents
+
+        class ThesisFileManager {
+            constructor(thesisId) {
+                this.thesisId = thesisId;
+                this.files = [];
+                this.uploadInProgress = false;
+            }
+
+            // Create the file upload UI component
+            createFileUploadHTML() {
+                return `
+                    <div class="file-manager-section">
+                        <div class="file-upload-header">
+                            <h3 class="section-title">
+                                <span class="section-icon">📁</span>
+                                Διαχείριση Αρχείων
+                            </h3>
+                        </div>
+
+                        <!-- File Upload Area -->
+                        <div class="file-upload-container">
+                            <div class="upload-area" id="uploadArea-${this.thesisId}" onclick="document.getElementById('fileInput-${this.thesisId}').click()">
+                                <div class="upload-icon">📤</div>
+                                <div class="upload-text">
+                                    <strong>Κάντε κλικ για να επιλέξετε αρχεία</strong><br>
+                                    ή σύρετε και αφήστε τα εδώ
+                                </div>
+                                <div class="upload-info">
+                                    Υποστηριζόμενα: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, ZIP, εικόνες<br>
+                                    Μέγιστο μέγεθος: 10GB
+                                </div>
+                            </div>
+                            <input type="file" id="fileInput-${this.thesisId}" class="file-input" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt,.jpg,.jpeg,.png,.gif,.webp">
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div class="upload-progress" id="uploadProgress-${this.thesisId}" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill-${this.thesisId}"></div>
+                            </div>
+                            <div class="progress-text" id="progressText-${this.thesisId}">Μεταφόρτωση...</div>
+                        </div>
+
+                        <!-- File List -->
+                        <div class="file-list-container">
+                            <div class="file-list-header">
+                                <span class="file-count">Αρχεία (<span id="fileCount-${this.thesisId}">0</span>)</span>
+                                <button class="refresh-btn" onclick="thesisFileManager_${this.thesisId}.loadFiles()">
+                                    🔄 Ανανέωση
+                                </button>
+                            </div>
+                            <div class="file-list" id="fileList-${this.thesisId}">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    Φόρτωση αρχείων...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Initialize the file manager after adding HTML to page
+            initialize() {
+                const uploadArea = document.getElementById(`uploadArea-${this.thesisId}`);
+                const fileInput = document.getElementById(`fileInput-${this.thesisId}`);
+
+                // Set up drag and drop
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, this.preventDefaults, false);
+                });
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => this.highlight(uploadArea), false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, () => this.unhighlight(uploadArea), false);
+                });
+
+                uploadArea.addEventListener('drop', (e) => this.handleDrop(e), false);
+                fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+
+                // Load existing files
+                this.loadFiles();
+            }
+
+            preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            highlight(element) {
+                element.classList.add('dragover');
+            }
+
+            unhighlight(element) {
+                element.classList.remove('dragover');
+            }
+
+            handleDrop(e) {
+                const files = e.dataTransfer.files;
+                this.processFiles(files);
+            }
+
+            handleFileSelect(e) {
+                const files = e.target.files;
+                this.processFiles(files);
+            }
+
+            async processFiles(files) {
+                if (this.uploadInProgress) {
+                    this.showToast('Υπάρχει ήδη μεταφόρτωση σε εξέλιξη', 'warning');
+                    return;
+                }
+
+                if (files.length === 0) {
+                    return;
+                }
+
+                if (files.length > 5) {
+                    this.showToast('Μπορείτε να ανεβάσετε μέχρι 5 αρχεία ταυτόχρονα', 'error');
+                    return;
+                }
+
+                this.uploadInProgress = true;
+                this.showProgress(true);
+
+                try {
+                    const formData = new FormData();
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showToast(`Επιτυχής μεταφόρτωση ${result.files.length} αρχείου/αρχείων`, 'success');
+                        this.loadFiles(); // Reload file list
+                    } else {
+                        this.showToast(result.message || 'Σφάλμα μεταφόρτωσης', 'error');
+                    }
+
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    this.showToast('Σφάλμα κατά τη μεταφόρτωση αρχείων', 'error');
+                }
+
+                this.uploadInProgress = false;
+                this.showProgress(false);
+                
+                // Clear file input
+                document.getElementById(`fileInput-${this.thesisId}`).value = '';
+            }
+
+            showProgress(show) {
+                const progressElement = document.getElementById(`uploadProgress-${this.thesisId}`);
+                if (show) {
+                    progressElement.style.display = 'block';
+                    // You can add actual progress tracking here if needed
+                    document.getElementById(`progressText-${this.thesisId}`).textContent = 'Μεταφόρτωση αρχείων...';
+                } else {
+                    progressElement.style.display = 'none';
+                }
+            }
+
+            async loadFiles() {
+                const fileListElement = document.getElementById(`fileList-${this.thesisId}`);
+                const fileCountElement = document.getElementById(`fileCount-${this.thesisId}`);
+
+                try {
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/files`);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.files = result.files || [];
+                        
+                        fileCountElement.textContent = this.files.length;
+                        
+                        if (this.files.length > 0) {
+                            this.renderFileList();
+                        } else {
+                            this.renderEmptyState();
+                        }
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                } catch (error) {
+                    console.error('Error loading files:', error);
+                    fileListElement.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">❌</div>
+                            <p>Σφάλμα φόρτωσης αρχείων</p>
+                        </div>
+                    `;
+                }
+            }
+
+            renderFileList() {
+                const fileListElement = document.getElementById(`fileList-${this.thesisId}`);
+                
+                const filesHTML = this.files.map(file => {
+                    const fileIcon = this.getFileIcon(file.fileType);
+                    const uploadDate = new Date(file.uploadedAt).toLocaleDateString('el-GR', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    return `
+                        <div class="file-item" data-file-id="${file.id}">
+                            <div class="file-info">
+                                <div class="file-icon">${fileIcon}</div>
+                                <div class="file-details">
+                                    <div class="file-name" title="${file.fileName}">${file.fileName}</div>
+                                    <div class="file-meta">
+                                        Ανέβηκε από: ${file.uploadedBy.name} • ${uploadDate}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <button class="file-action-btn" onclick="thesisFileManager_${this.thesisId}.downloadFile(${file.id})" title="Κατέβασμα">
+                                    📥
+                                </button>
+                                ${this.canDeleteFile(file) ? `
+                                    <button class="file-action-btn delete" onclick="thesisFileManager_${this.thesisId}.deleteFile(${file.id}, '${file.fileName}')" title="Διαγραφή">
+                                        🗑️
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                fileListElement.innerHTML = filesHTML;
+            }
+
+            renderEmptyState() {
+                const fileListElement = document.getElementById(`fileList-${this.thesisId}`);
+                fileListElement.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>Δεν υπάρχουν αρχεία για αυτή τη διπλωματική</p>
+                        <small>Ανεβάστε αρχεία χρησιμοποιώντας την περιοχή μεταφόρτωσης παραπάνω</small>
+                    </div>
+                `;
+            }
+
+            getFileIcon(fileType) {
+                if (fileType.includes('pdf')) return '📄';
+                if (fileType.includes('word') || fileType.includes('document')) return '📝';
+                if (fileType.includes('presentation') || fileType.includes('powerpoint')) return '📊';
+                if (fileType.includes('spreadsheet') || fileType.includes('excel')) return '📈';
+                if (fileType.includes('image')) return '🖼️';
+                if (fileType.includes('zip') || fileType.includes('compressed')) return '📦';
+                if (fileType.includes('text')) return '📋';
+                return '📄';
+            }
+
+            canDeleteFile(file) {
+                // Users can delete their own files, secretaries can delete any file
+                const currentUser = window.currentUser || {};
+                return currentUser.user_type === 'secretary' || 
+                    (currentUser.id && file.uploadedBy && file.uploadedBy.id === currentUser.id);
+            }
+
+            async downloadFile(fileId) {
+                try {
+                    // Open download in new window/tab
+                    window.open(`/api/files/thesis/${this.thesisId}/files/${fileId}/download`);
+                } catch (error) {
+                    console.error('Download error:', error);
+                    this.showToast('Σφάλμα κατεβάσματος αρχείου', 'error');
+                }
+            }
+
+            async deleteFile(fileId, fileName) {
+                if (!confirm(`Είστε σίγουροι ότι θέλετε να διαγράψετε το αρχείο "${fileName}";`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/files/${fileId}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showToast('Το αρχείο διαγράφηκε επιτυχώς', 'success');
+                        this.loadFiles(); // Reload file list
+                    } else {
+                        this.showToast(result.message || 'Σφάλμα διαγραφής αρχείου', 'error');
+                    }
+
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    this.showToast('Σφάλμα κατά τη διαγραφή του αρχείου', 'error');
+                }
+            }
+
+            showToast(message, type = 'info') {
+                // Remove existing toasts
+                document.querySelectorAll('.toast').forEach(toast => toast.remove());
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">
+                            ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
+                        </span>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 5000);
+            }
+        }
+
+        // Function to create and initialize file manager for a thesis
+        function createThesisFileManager(thesisId, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!container) {
+                console.error(`Container ${containerId} not found`);
+                return null;
+            }
+
+            // Create the file manager instance
+            const fileManager = new ThesisFileManager(thesisId);
+            
+            // Add HTML to container
+            container.innerHTML = fileManager.createFileUploadHTML();
+            
+            // Make file manager globally accessible with unique name
+            window[`thesisFileManager_${thesisId}`] = fileManager;
+            
+            // Initialize functionality
+            fileManager.initialize();
+            
+            return fileManager;
+        }
+
+        // Additional CSS for the file manager component (add to your existing styles)
+        const fileManagerCSS = `
+        .file-manager-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .file-upload-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-icon {
+            font-size: 1.2rem;
+        }
+
+        .file-upload-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .upload-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .file-list-container {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-top: 1rem;
+        }
+
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .file-count {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #f7fafc;
+            border-color: #667eea;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        `;
+
+        // Add the CSS to the page if it doesn't exist
+        if (!document.getElementById('fileManagerStyles')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'fileManagerStyles';
+            styleSheet.textContent = fileManagerCSS;
+            document.head.appendChild(styleSheet);
+        }
+
         // Initialize dashboard when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeDashboard();
         });
+
+        function renderStudentThesis(thesisData) {
+            const thesisContent = document.getElementById('thesisContent');
+            
+            if (thesisData && thesisData.id) {
+                thesisContent.innerHTML = `
+                    <div class="thesis-info">
+                        <h3>${thesisData.title}</h3>
+                        <div class="thesis-details">
+                            <p><strong>Επιβλέπων:</strong> ${thesisData.supervisor_name}</p>
+                            <p><strong>Κατάσταση:</strong> 
+                                <span class="status-badge status-${thesisData.status.replace('_', '-')}">
+                                    ${getStatusText(thesisData.status)}
+                                </span>
+                            </p>
+                            <p><strong>Ημερομηνία Ανάθεσης:</strong> ${formatDate(thesisData.assigned_at)}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- File Manager Integration -->
+                    <div id="studentFileManager-${thesisData.id}">
+                        <!-- File manager will be inserted here -->
+                    </div>
+                    
+                    <div class="thesis-actions">
+                        <button class="action-btn" onclick="viewProgress()">
+                            📊 Πρόοδος
+                        </button>
+                        <button class="action-btn secondary" onclick="contactSupervisor()">
+                            📧 Επικοινωνία
+                        </button>
+                    </div>
+                `;
+                
+                // Initialize file manager for this thesis
+                createThesisFileManager(thesisData.id, `studentFileManager-${thesisData.id}`);
+            } else {
+                thesisContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>Δεν έχετε ανατεθεί διπλωματική εργασία</p>
+                        <button class="action-btn" onclick="browseAvailableTopics()">
+                            🔍 Περιήγηση Θεμάτων
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Enhanced tab switching to handle file management
+        function switchTabWithFileManagement(tabName) {
+            console.log('🔄 Switching to tab:', tabName);
+
+            // Update navigation buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data for the selected tab
+            switch(tabName) {
+                case 'files':
+                    loadThesesForFileManagement();
+                    break;
+                // Add other cases as needed
+            }
+        }
+
+        // File type validation helper
+        function validateFileForUpload(file) {
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/zip',
+                'application/x-zip-compressed',
+                'text/plain',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp'
+            ];
+            
+            const maxSize = 10 * 1024 * 1024 * 1024; // 10GB
+            
+            if (!allowedTypes.includes(file.type)) {
+                return { valid: false, message: 'Μη υποστηριζόμενος τύπος αρχείου' };
+            }
+            
+            if (file.size > maxSize) {
+                return { valid: false, message: 'Το αρχείο είναι πολύ μεγάλο (>10GB)' };
+            }
+            
+            return { valid: true };
+        }
+
 
         // Main initialization function
         async function initializeDashboard() {

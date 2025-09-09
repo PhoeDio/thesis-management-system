@@ -533,4 +533,138 @@ router.get('/users', async (req, res) => {
     }
 });
 
+
+/**
+ * 🔄 PUT /api/secretary/thesis/:id/status - Administrative status change
+ */
+router.put('/thesis/:id/status', async (req, res) => {
+    try {
+        const thesisId = req.params.id;
+        const { new_status, reason, final_grade, general_assembly_number, general_assembly_year } = req.body;
+
+        const validStatuses = ['under_assignment', 'active', 'under_examination', 'completed', 'cancelled'];
+        
+        if (!validStatuses.includes(new_status)) {
+            return res.status(400).json({ 
+                message: 'Invalid status',
+                validStatuses: validStatuses 
+            });
+        }
+
+        // Get current thesis status
+        const currentThesis = await pool.query(`
+            SELECT id, status FROM thesis_works WHERE id = $1
+        `, [thesisId]);
+
+        if (currentThesis.rows.length === 0) {
+            return res.status(404).json({ message: 'Thesis not found' });
+        }
+
+        const currentStatus = currentThesis.rows[0].status;
+
+        // Prepare update query based on new status
+        let updateQuery = `UPDATE thesis_works SET status = $1, updated_at = CURRENT_TIMESTAMP`;
+        let updateParams = [new_status];
+        let paramCount = 1;
+
+        if (new_status === 'active') {
+            updateQuery += `, activated_at = CURRENT_TIMESTAMP`;
+        } else if (new_status === 'under_examination') {
+            updateQuery += `, examination_started_at = CURRENT_TIMESTAMP`;
+        } else if (new_status === 'completed') {
+            updateQuery += `, completed_at = CURRENT_TIMESTAMP`;
+            if (final_grade) {
+                paramCount++;
+                updateQuery += `, final_grade = $${paramCount}`;
+                updateParams.push(final_grade);
+            }
+            if (general_assembly_number) {
+                paramCount++;
+                updateQuery += `, general_assembly_number = $${paramCount}`;
+                updateParams.push(general_assembly_number);
+            }
+            if (general_assembly_year) {
+                paramCount++;
+                updateQuery += `, general_assembly_year = $${paramCount}`;
+                updateParams.push(general_assembly_year);
+            }
+        } else if (new_status === 'cancelled') {
+            updateQuery += `, cancelled_at = CURRENT_TIMESTAMP, cancelled_by = 'secretary'`;
+            if (reason) {
+                paramCount++;
+                updateQuery += `, cancellation_reason = $${paramCount}`;
+                updateParams.push(reason);
+            }
+        }
+
+        paramCount++;
+        updateQuery += ` WHERE id = $${paramCount}`;
+        updateParams.push(thesisId);
+
+        // Update thesis
+        await pool.query(updateQuery, updateParams);
+
+        // Record status change
+        await pool.query(`
+            INSERT INTO thesis_status_history (thesis_id, from_status, to_status, changed_by, change_reason)
+            VALUES ($1, $2, $3, $4, $5)
+        `, [thesisId, currentStatus, new_status, req.session.user.id, reason || `Administrative status change to ${new_status}`]);
+
+        res.json({ 
+            message: 'Thesis status updated successfully',
+            from_status: currentStatus,
+            to_status: new_status 
+        });
+
+    } catch (error) {
+        console.error('Update thesis status error:', error);
+        res.status(500).json({ message: 'Failed to update thesis status' });
+    }
+});
+
+/**
+ * 📊 GET /api/secretary/status-transitions - View all status changes
+ */
+router.get('/status-transitions', async (req, res) => {
+    try {
+        const { limit = 50, offset = 0 } = req.query;
+        
+        const transitions = await pool.query(`
+            SELECT 
+                tsh.id,
+                tsh.thesis_id,
+                tsh.from_status,
+                tsh.to_status,
+                tsh.change_reason,
+                tsh.changed_at,
+                tt.title as thesis_title,
+                CONCAT(student_user.first_name, ' ', student_user.last_name) as student_name,
+                s.student_id as student_number,
+                CONCAT(changed_by_user.first_name, ' ', changed_by_user.last_name) as changed_by_name,
+                changed_by_user.user_type as changed_by_type
+            FROM thesis_status_history tsh
+            JOIN thesis_works tw ON tsh.thesis_id = tw.id
+            JOIN thesis_topics tt ON tw.topic_id = tt.id
+            JOIN students st ON tw.student_id = st.id
+            JOIN users student_user ON st.user_id = student_user.id
+            JOIN students s ON st.id = s.id
+            LEFT JOIN users changed_by_user ON tsh.changed_by = changed_by_user.id
+            ORDER BY tsh.changed_at DESC
+            LIMIT $1 OFFSET $2
+        `, [limit, offset]);
+
+        res.json({ 
+            transitions: transitions.rows,
+            pagination: {
+                limit: parseInt(limit),
+                offset: parseInt(offset)
+            }
+        });
+
+    } catch (error) {
+        console.error('Get status transitions error:', error);
+        res.status(500).json({ message: 'Failed to load status transitions' });
+    }
+});
+
 module.exports = router;
