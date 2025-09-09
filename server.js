@@ -52,6 +52,7 @@ const secretaryRoutes = safeRequire('./src/routes/secretary', 'Secretary routes 
 const publicRoutes = safeRequire('./src/routes/public', 'Public routes not found');
 const committeeRoutes = safeRequire('./src/routes/committeeRoute', 'Committee routes not found');
 const fileRoutes = safeRequire('./src/routes/files', 'File routes not found');
+const statusRoutes = safeRequire('./src/routes/status', 'Status routes not found');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/professor', professorRoutes);
@@ -60,6 +61,7 @@ app.use('/api/secretary', secretaryRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/committee', committeeRoutes); 
 app.use('/api/files', fileRoutes);
+app.use('/api/status', statusRoutes);
 
 // Serve main page
 app.get('/', (req, res) => {

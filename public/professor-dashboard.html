@@ -503,6 +503,494 @@
                 justify-content: center;
             }
         }
+
+        /* Workflow Manager Styles */
+        .workflow-manager-section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .workflow-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+        }
+
+        .workflow-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .workflow-icon {
+            font-size: 1.2rem;
+        }
+
+        .current-status-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-under-assignment {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .status-under-examination {
+            background: #fed7e2;
+            color: #742a2a;
+        }
+
+        .status-completed {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .status-cancelled {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .committee-section, .transitions-section, .history-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .committee-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .stat-value.accepted {
+            color: #22543d;
+        }
+
+        .stat-value.pending {
+            color: #744210;
+        }
+
+        .stat-value.rejected {
+            color: #742a2a;
+        }
+
+        .completion-status {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .completion-status.complete {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .completion-status.incomplete {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .committee-members {
+            margin-top: 1rem;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .member-name {
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .member-role {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .member-status {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .member-status.accepted {
+            color: #22543d;
+        }
+
+        .member-status.pending {
+            color: #744210;
+        }
+
+        .member-status.rejected {
+            color: #742a2a;
+        }
+
+        .committee-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .workflow-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .workflow-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .workflow-btn.secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .transitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .transition-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transition-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .transition-btn.available {
+            border-color: #667eea;
+            color: #2d3748;
+        }
+
+        .transition-btn.available:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .transition-btn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            color: #666;
+        }
+
+        .transition-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .transition-description {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .missing-conditions {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            font-style: italic;
+        }
+
+        .history-timeline {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .history-item.latest {
+            border-left-color: #667eea;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0.5rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+
+        .history-item.latest::before {
+            background: #667eea;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-change {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .arrow {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .history-reason {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-user {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .workflow-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-header h4 {
+            margin: 0;
+            color: #2d3748;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .professor-selection label,
+        .invitation-message label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .professor-checkboxes {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f7fafc;
+        }
+
+        .professor-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .professor-option input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .professor-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .invitation-message {
+            margin-top: 1rem;
+        }
+
+        .invitation-message textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .no-transitions, .no-history {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            text-align: center;
+            font-style: italic;
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .committee-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .transitions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .member-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            
+            .committee-actions {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1119,6 +1607,543 @@
             document.head.appendChild(styleSheet);
         }
 
+        /*
+         * COMPLETE THESIS WORKFLOW MANAGER CLASS
+         */
+        class ThesisWorkflowManager {
+            constructor(thesisId, containerId) {
+                this.thesisId = thesisId;
+                this.containerId = containerId;
+                this.availableTransitions = [];
+                this.committeeStatus = null;
+                this.statusHistory = [];
+            }
+
+            // Create the workflow management interface
+            createWorkflowHTML() {
+                return `
+                    <div class="workflow-manager-section">
+                        <div class="workflow-header">
+                            <h4 class="workflow-title">
+                                <span class="workflow-icon">⚙️</span>
+                                Διαχείριση Workflow
+                            </h4>
+                        </div>
+
+                        <!-- Current Status Display -->
+                        <div class="current-status-section">
+                            <div class="status-label">Τρέχουσα Κατάσταση:</div>
+                            <div class="current-status" id="currentStatus-${this.thesisId}">
+                                <span class="status-badge">Φόρτωση...</span>
+                            </div>
+                        </div>
+
+                        <!-- Committee Status -->
+                        <div class="committee-section">
+                            <h5 class="section-subtitle">📋 Κατάσταση Επιτροπής</h5>
+                            <div id="committeeStatus-${this.thesisId}" class="committee-display">
+                                Φόρτωση κατάστασης επιτροπής...
+                            </div>
+                            <div class="committee-actions">
+                                <button class="workflow-btn secondary" onclick="window.workflowManager_${this.thesisId}.showInviteCommittee()">
+                                    👥 Πρόσκληση Μελών
+                                </button>
+                                <button class="workflow-btn secondary" onclick="window.workflowManager_${this.thesisId}.refreshCommitteeStatus()">
+                                    🔄 Ανανέωση
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Available Transitions -->
+                        <div class="transitions-section">
+                            <h5 class="section-subtitle">🔄 Διαθέσιμες Μεταβάσεις</h5>
+                            <div id="availableTransitions-${this.thesisId}" class="transitions-list">
+                                Φόρτωση διαθέσιμων μεταβάσεων...
+                            </div>
+                        </div>
+
+                        <!-- Status History -->
+                        <div class="history-section">
+                            <h5 class="section-subtitle">📜 Ιστορικό Καταστάσεων</h5>
+                            <div id="statusHistory-${this.thesisId}" class="history-list">
+                                Φόρτωση ιστορικού...
+                            </div>
+                        </div>
+
+                        <!-- Committee Invitation Modal -->
+                        <div id="inviteModal-${this.thesisId}" class="workflow-modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4>Πρόσκληση Μελών Επιτροπής</h4>
+                                    <button class="close-btn" onclick="window.workflowManager_${this.thesisId}.hideInviteCommittee()">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="professor-selection">
+                                        <label>Επιλογή Καθηγητών:</label>
+                                        <div id="professorList-${this.thesisId}" class="professor-list">
+                                            <!-- Professors will be loaded here -->
+                                        </div>
+                                    </div>
+                                    <div class="invitation-message">
+                                        <label>Μήνυμα Πρόσκλησης (προαιρετικό):</label>
+                                        <textarea id="inviteMessage-${this.thesisId}" rows="3" placeholder="Προσθέστε ένα προσωπικό μήνυμα στην πρόσκληση..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="workflow-btn secondary" onclick="window.workflowManager_${this.thesisId}.hideInviteCommittee()">
+                                        Ακύρωση
+                                    </button>
+                                    <button class="workflow-btn" onclick="window.workflowManager_${this.thesisId}.sendInvitations()">
+                                        📧 Αποστολή Προσκλήσεων
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Initialize the workflow manager
+            async initialize() {
+                const container = document.getElementById(this.containerId);
+                if (!container) {
+                    console.error(`Workflow container ${this.containerId} not found`);
+                    return;
+                }
+
+                container.innerHTML = this.createWorkflowHTML();
+                
+                // Load initial data
+                await this.loadCurrentStatus();
+                await this.loadCommitteeStatus();
+                await this.loadAvailableTransitions();
+                await this.loadStatusHistory();
+            }
+
+            // Load current thesis status (simulate with static data for now)
+            async loadCurrentStatus() {
+                try {
+                    // For now, we'll simulate this - you can connect to real API later
+                    const statusElement = document.getElementById(`currentStatus-${this.thesisId}`);
+                    statusElement.innerHTML = `<span class="status-badge status-active">Ενεργή</span>`;
+                } catch (error) {
+                    console.error('Error loading current status:', error);
+                }
+            }
+
+            // Load committee status
+            async loadCommitteeStatus() {
+                try {
+                    const response = await fetch(`/api/committee/thesis/${this.thesisId}/status`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.committeeStatus = result.data;
+                        this.renderCommitteeStatus();
+                    } else {
+                        // If no committee exists yet, show empty state
+                        this.committeeStatus = {
+                            committee: [],
+                            statistics: { total: 0, accepted: 0, pending: 0, rejected: 0 },
+                            isComplete: false
+                        };
+                        this.renderCommitteeStatus();
+                    }
+                } catch (error) {
+                    console.error('Error loading committee status:', error);
+                    const statusElement = document.getElementById(`committeeStatus-${this.thesisId}`);
+                    statusElement.innerHTML = '<div class="error-message">Σφάλμα φόρτωσης κατάστασης επιτροπής</div>';
+                }
+            }
+
+            // Render committee status display
+            renderCommitteeStatus() {
+                const container = document.getElementById(`committeeStatus-${this.thesisId}`);
+                const { committee, statistics, isComplete } = this.committeeStatus;
+
+                let html = `
+                    <div class="committee-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Σύνολο Μελών:</span>
+                            <span class="stat-value">${statistics.total}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Αποδεκτές:</span>
+                            <span class="stat-value accepted">${statistics.accepted}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Εκκρεμείς:</span>
+                            <span class="stat-value pending">${statistics.pending}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Απορριφθείσες:</span>
+                            <span class="stat-value rejected">${statistics.rejected}</span>
+                        </div>
+                        <div class="completion-status ${isComplete ? 'complete' : 'incomplete'}">
+                            ${isComplete ? '✅ Επιτροπή Πλήρης' : '⏳ Επιτροπή Ελλιπής'}
+                        </div>
+                    </div>
+                `;
+
+                if (committee.length > 0) {
+                    html += '<div class="committee-members">';
+                    committee.forEach(member => {
+                        const statusIcon = member.status === 'accepted' ? '✅' : 
+                                         member.status === 'rejected' ? '❌' : '⏳';
+                        html += `
+                            <div class="member-item">
+                                <span class="member-name">${member.professor.name}</span>
+                                <span class="member-role">${member.role === 'supervisor' ? 'Επιβλέπων' : 'Μέλος'}</span>
+                                <span class="member-status ${member.status}">${statusIcon} ${this.getInvitationStatusText(member.status)}</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="no-transitions">Δεν έχουν προσκληθεί μέλη επιτροπής ακόμα</div>';
+                }
+
+                container.innerHTML = html;
+            }
+
+            // Load available transitions
+            async loadAvailableTransitions() {
+                try {
+                    const response = await fetch(`/api/status/thesis/${this.thesisId}/transitions`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.availableTransitions = result.data.availableTransitions;
+                        this.renderAvailableTransitions();
+                    } else {
+                        // Show empty state if no transitions available
+                        this.availableTransitions = [];
+                        this.renderAvailableTransitions();
+                    }
+                } catch (error) {
+                    console.error('Error loading transitions:', error);
+                    const container = document.getElementById(`availableTransitions-${this.thesisId}`);
+                    container.innerHTML = '<div class="error-message">Σφάλμα φόρτωσης μεταβάσεων</div>';
+                }
+            }
+
+            // Render available transitions
+            renderAvailableTransitions() {
+                const container = document.getElementById(`availableTransitions-${this.thesisId}`);
+                
+                if (this.availableTransitions.length === 0) {
+                    container.innerHTML = '<div class="no-transitions">Δεν υπάρχουν διαθέσιμες μεταβάσεις αυτή τη στιγμή</div>';
+                    return;
+                }
+
+                let html = '<div class="transitions-grid">';
+                this.availableTransitions.forEach(transition => {
+                    const isAvailable = transition.conditionsMet;
+                    const buttonClass = isAvailable ? 'transition-btn available' : 'transition-btn disabled';
+                    const statusText = this.getStatusText(transition.targetStatus);
+                    
+                    html += `
+                        <div class="transition-item">
+                            <button class="${buttonClass}" 
+                                    ${isAvailable ? `onclick="window.workflowManager_${this.thesisId}.executeTransition('${transition.targetStatus}')"` : 'disabled'}>
+                                <div class="transition-title">${statusText}</div>
+                                <div class="transition-description">${transition.description}</div>
+                                ${!isAvailable ? '<div class="missing-conditions">⚠️ Απαιτούνται επιπλέον προϋποθέσεις</div>' : ''}
+                            </button>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+            }
+
+            // Load status history
+            async loadStatusHistory() {
+                try {
+                    const response = await fetch(`/api/status/thesis/${this.thesisId}/history`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.statusHistory = result.data.history;
+                        this.renderStatusHistory();
+                    } else {
+                        this.statusHistory = [];
+                        this.renderStatusHistory();
+                    }
+                } catch (error) {
+                    console.error('Error loading status history:', error);
+                    const container = document.getElementById(`statusHistory-${this.thesisId}`);
+                    container.innerHTML = '<div class="error-message">Σφάλμα φόρτωσης ιστορικού</div>';
+                }
+            }
+
+            // Render status history
+            renderStatusHistory() {
+                const container = document.getElementById(`statusHistory-${this.thesisId}`);
+                
+                if (this.statusHistory.length === 0) {
+                    container.innerHTML = '<div class="no-history">Δεν υπάρχει ιστορικό καταστάσεων</div>';
+                    return;
+                }
+
+                let html = '<div class="history-timeline">';
+                this.statusHistory.forEach((record, index) => {
+                    const fromStatusText = this.getStatusText(record.fromStatus);
+                    const toStatusText = this.getStatusText(record.toStatus);
+                    const date = new Date(record.changedAt).toLocaleDateString('el-GR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    html += `
+                        <div class="history-item ${index === 0 ? 'latest' : ''}">
+                            <div class="history-date">${date}</div>
+                            <div class="history-change">
+                                <span class="from-status">${fromStatusText}</span>
+                                <span class="arrow">→</span>
+                                <span class="to-status">${toStatusText}</span>
+                            </div>
+                            <div class="history-reason">${record.reason}</div>
+                            <div class="history-user">από ${record.changedBy.name} (${this.getUserTypeText(record.changedBy.type)})</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+            }
+
+            // Execute a status transition
+            async executeTransition(targetStatus) {
+                const reason = prompt(`Παρακαλώ εισάγετε τον λόγο για την αλλαγή κατάστασης σε "${this.getStatusText(targetStatus)}":`);
+                
+                if (!reason) {
+                    return; // User cancelled
+                }
+
+                try {
+                    const response = await fetch(`/api/status/thesis/${this.thesisId}/transition`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            targetStatus: targetStatus,
+                            reason: reason
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(`Η κατάσταση άλλαξε επιτυχώς σε "${this.getStatusText(targetStatus)}"`, 'success');
+                        
+                        // Reload all data to reflect the changes
+                        await this.loadCurrentStatus();
+                        await this.loadAvailableTransitions();
+                        await this.loadStatusHistory();
+                    } else {
+                        showMessage(`Σφάλμα: ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error executing transition:', error);
+                    showMessage('Σφάλμα κατά την εκτέλεση της μετάβασης', 'error');
+                }
+            }
+
+            // Show committee invitation modal
+            async showInviteCommittee() {
+                const modal = document.getElementById(`inviteModal-${this.thesisId}`);
+                modal.style.display = 'block';
+                
+                // Load available professors
+                await this.loadAvailableProfessors();
+            }
+
+            // Hide committee invitation modal
+            hideInviteCommittee() {
+                const modal = document.getElementById(`inviteModal-${this.thesisId}`);
+                modal.style.display = 'none';
+            }
+
+            // Load available professors for invitation
+            async loadAvailableProfessors() {
+                try {
+                    // For now, we'll use a simulated list of professors
+                    // Later, you can create an API endpoint to get actual professors
+                    const professors = [
+                        { id: 1, first_name: 'Ιωάννης', last_name: 'Παπαδόπουλος', specialization: 'Τεχνητή Νοημοσύνη' },
+                        { id: 2, first_name: 'Μαρία', last_name: 'Κωνσταντίνου', specialization: 'Βάσεις Δεδομένων' },
+                        { id: 3, first_name: 'Δημήτρης', last_name: 'Αντωνίου', specialization: 'Δίκτυα Υπολογιστών' },
+                        { id: 4, first_name: 'Ελένη', last_name: 'Γεωργίου', specialization: 'Ασφάλεια Συστημάτων' }
+                    ];
+                    
+                    this.renderProfessorList(professors);
+                } catch (error) {
+                    console.error('Error loading professors:', error);
+                    const container = document.getElementById(`professorList-${this.thesisId}`);
+                    container.innerHTML = '<div class="error-message">Σφάλμα φόρτωσης καθηγητών</div>';
+                }
+            }
+
+            // Render professor selection list
+            renderProfessorList(professors) {
+                const container = document.getElementById(`professorList-${this.thesisId}`);
+                
+                let html = '<div class="professor-checkboxes">';
+                professors.forEach(professor => {
+                    // Check if this professor is already invited
+                    const alreadyInvited = this.committeeStatus.committee.some(member => 
+                        member.professor.name === `${professor.first_name} ${professor.last_name}`
+                    );
+                    
+                    html += `
+                        <div class="professor-option">
+                            <input type="checkbox" 
+                                   id="prof-${professor.id}-${this.thesisId}" 
+                                   value="${professor.id}"
+                                   ${alreadyInvited ? 'disabled checked' : ''}>
+                            <label for="prof-${professor.id}-${this.thesisId}">
+                                ${professor.first_name} ${professor.last_name}
+                                ${professor.specialization ? ` (${professor.specialization})` : ''}
+                                ${alreadyInvited ? ' - Ήδη προσκεκλημένος' : ''}
+                            </label>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                container.innerHTML = html;
+            }
+
+            // Send committee invitations
+            async sendInvitations() {
+                const checkboxes = document.querySelectorAll(`#professorList-${this.thesisId} input[type="checkbox"]:checked:not(:disabled)`);
+                const professorIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                const message = document.getElementById(`inviteMessage-${this.thesisId}`).value;
+
+                if (professorIds.length === 0) {
+                    showMessage('Παρακαλώ επιλέξτε τουλάχιστον έναν καθηγητή', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/committee/thesis/${this.thesisId}/invite`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            professorIds: professorIds,
+                            message: message
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(`Εστάλησαν ${professorIds.length} προσκλήσεις επιτυχώς`, 'success');
+                        this.hideInviteCommittee();
+                        await this.loadCommitteeStatus();
+                    } else {
+                        showMessage(`Σφάλμα: ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error sending invitations:', error);
+                    showMessage('Σφάλμα κατά την αποστολή προσκλήσεων', 'error');
+                }
+            }
+
+            // Refresh committee status
+            async refreshCommitteeStatus() {
+                await this.loadCommitteeStatus();
+                await this.loadAvailableTransitions();
+                showMessage('Η κατάσταση επιτροπής ανανεώθηκε', 'info');
+            }
+
+            // Helper methods for text conversion
+            getStatusText(status) {
+                const statusMap = {
+                    'under_assignment': 'Υπό Ανάθεση',
+                    'active': 'Ενεργή',
+                    'under_examination': 'Υπό Εξέταση',
+                    'completed': 'Ολοκληρωμένη',
+                    'cancelled': 'Ακυρωμένη'
+                };
+                return statusMap[status] || status;
+            }
+
+            getStatusClass(status) {
+                const classMap = {
+                    'under_assignment': 'status-under-assignment',
+                    'active': 'status-active',
+                    'under_examination': 'status-under-examination',
+                    'completed': 'status-completed',
+                    'cancelled': 'status-cancelled'
+                };
+                return classMap[status] || 'status-unknown';
+            }
+
+            getInvitationStatusText(status) {
+                const statusMap = {
+                    'pending': 'Εκκρεμής',
+                    'accepted': 'Αποδεκτή',
+                    'rejected': 'Απορρίφθηκε'
+                };
+                return statusMap[status] || status;
+            }
+
+            getUserTypeText(userType) {
+                const typeMap = {
+                    'professor': 'Καθηγητής',
+                    'student': 'Φοιτητής',
+                    'secretary': 'Γραμματεία'
+                };
+                return typeMap[userType] || userType;
+            }
+        }
+
+        // Factory function to create workflow managers
+        function createThesisWorkflowManager(thesisId, containerId) {
+            const workflowManager = new ThesisWorkflowManager(thesisId, containerId);
+            
+            // Make it globally accessible
+            window[`workflowManager_${thesisId}`] = workflowManager;
+            
+            // Initialize after DOM is ready
+            setTimeout(() => {
+                workflowManager.initialize();
+            }, 100);
+            
+            return workflowManager;
+        }
+
+        // Toggle workflow manager visibility
+        function toggleWorkflowManager(thesisId) {
+            const container = document.getElementById(`workflowManager-${thesisId}`);
+            
+            if (!container) {
+                console.error(`Workflow container not found for thesis ${thesisId}`);
+                return;
+            }
+
+            const isVisible = container.style.display === 'block';
+            
+            if (isVisible) {
+                container.style.display = 'none';
+            } else {
+                container.style.display = 'block';
+                // Create workflow manager if it doesn't exist
+                if (!window[`workflowManager_${thesisId}`]) {
+                    createThesisWorkflowManager(thesisId, `workflowManager-${thesisId}`);
+                }
+            }
+        }
+
         // Initialize dashboard when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Professor dashboard starting...');
@@ -1147,6 +2172,11 @@
                                 <!-- File manager will be inserted here -->
                             </div>
                         </div>
+
+                        <!-- Workflow Manager Section for this thesis -->
+                        <div class="thesis-workflow-section" id="workflowManager-${thesis.id}" style="display: none;">
+                            <!-- Workflow manager will be inserted here -->
+                        </div>
                         
                         <div class="thesis-actions">
                             <button class="action-btn secondary" onclick="addNote(${thesis.id})">
@@ -1157,6 +2187,9 @@
                             </button>
                             <button class="action-btn" onclick="toggleFileManager(${thesis.id})">
                                 📁 Αρχεία
+                            </button>
+                            <button class="action-btn" onclick="toggleWorkflowManager(${thesis.id})">
+                                ⚙️ Workflow
                             </button>
                         </div>
                     </div>
