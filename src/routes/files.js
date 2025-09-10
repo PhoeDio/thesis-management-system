@@ -5,25 +5,20 @@ const fs = require('fs').promises;
 const router = express.Router();
 const { upload, handleUploadError } = require('../middleware/upload');
 const { pool } = require('../config/database');
-
-// Authentication middleware - require user to be logged in
-const requireAuth = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required',
-            error: 'UNAUTHORIZED'
-        });
-    }
-    next();
-};
+const { requireAuth } = require('../middleware/auth'); // USE THE SHARED ONE
 
 // Authorization middleware - check if user can access specific thesis
 const checkThesisAccess = async (req, res, next) => {
+    console.log('🔍 Checking thesis access:', {
+        thesisId: req.params.thesisId,
+        userId: req.user?.id,
+        userType: req.user?.user_type
+    });
+
     try {
         const thesisId = req.params.thesisId;
-        const userId = req.session.user.id;
-        const userType = req.session.user.user_type;
+        const userId = req.user.id;  // From shared requireAuth middleware
+        const userType = req.user.user_type;
         
         // Secretaries can access all thesis files for administrative purposes
         if (userType === 'secretary') {
@@ -83,7 +78,7 @@ router.post('/thesis/:thesisId/upload',
             }
 
             const thesisId = req.params.thesisId;
-            const uploadedBy = req.session.user.id;
+            const uploadedBy = req.user.id; // From shared requireAuth
             const uploadResults = [];
 
             // Process each uploaded file
@@ -243,8 +238,8 @@ router.get('/thesis/:thesisId/files/:fileId/download', requireAuth, checkThesisA
 router.delete('/thesis/:thesisId/files/:fileId', requireAuth, checkThesisAccess, async (req, res) => {
     try {
         const { thesisId, fileId } = req.params;
-        const userId = req.session.user.id;
-        const userType = req.session.user.user_type;
+        const userId = req.user.id;  // From shared requireAuth
+        const userType = req.user.user_type;
         
         // Get file information and check ownership
         const fileQuery = `
