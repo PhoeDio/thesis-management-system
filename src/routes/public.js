@@ -83,9 +83,14 @@ router.get('/announcements', async (req, res) => {
 
 /**
  * 📊 GET /api/public/statistics - Δημόσια στατιστικά (anonymized)
+ * 
+ * Educational Note: This endpoint demonstrates proper PostgreSQL syntax
+ * for complex queries with CASE statements and sorting.
  */
 router.get('/statistics', async (req, res) => {
     try {
+        console.log('📊 Generating public statistics...'); // Debug logging
+        
         // Γενικά στατιστικά (χωρίς προσωπικά δεδομένα)
         const generalStats = await pool.query(`
             SELECT 
@@ -100,6 +105,8 @@ router.get('/statistics', async (req, res) => {
             FROM thesis_works tw
         `);
 
+        console.log('✅ General stats query completed');
+
         // Στατιστικά ανά έτος
         const yearlyStats = await pool.query(`
             SELECT 
@@ -113,44 +120,65 @@ router.get('/statistics', async (req, res) => {
             LIMIT 5
         `);
 
-        // Κατανομή βαθμών (anonymized)
+        console.log('✅ Yearly stats query completed');
+
+        // Κατανομή βαθμών (anonymized) - FIXED VERSION
+        // Educational Note: We solve the PostgreSQL alias issue using a subquery approach
+        // This is a common pattern when you need to reference computed columns in ORDER BY
         const gradeDistribution = await pool.query(`
             SELECT 
-                CASE 
-                    WHEN final_grade >= 8.5 THEN 'Excellent (8.5-10)'
-                    WHEN final_grade >= 6.5 THEN 'Very Good (6.5-8.4)'
-                    WHEN final_grade >= 5.0 THEN 'Good (5.0-6.4)'
-                    ELSE 'Other'
-                END as grade_category,
-                COUNT(*) as count
-            FROM thesis_works
-            WHERE status = 'completed' AND final_grade IS NOT NULL
-            GROUP BY 
-                CASE 
-                    WHEN final_grade >= 8.5 THEN 'Excellent (8.5-10)'
-                    WHEN final_grade >= 6.5 THEN 'Very Good (6.5-8.4)'
-                    WHEN final_grade >= 5.0 THEN 'Good (5.0-6.4)'
-                    ELSE 'Other'
-                END
-            ORDER BY 
-                CASE 
-                    WHEN final_grade >= 8.5 THEN 1
-                    WHEN final_grade >= 6.5 THEN 2
-                    WHEN final_grade >= 5.0 THEN 3
+                grade_category,
+                count,
+                CASE grade_category
+                    WHEN 'Excellent (8.5-10)' THEN 1
+                    WHEN 'Very Good (6.5-8.4)' THEN 2
+                    WHEN 'Good (5.0-6.4)' THEN 3
                     ELSE 4
-                END
+                END as sort_order
+            FROM (
+                SELECT 
+                    CASE 
+                        WHEN final_grade >= 8.5 THEN 'Excellent (8.5-10)'
+                        WHEN final_grade >= 6.5 THEN 'Very Good (6.5-8.4)'
+                        WHEN final_grade >= 5.0 THEN 'Good (5.0-6.4)'
+                        ELSE 'Other'
+                    END as grade_category,
+                    COUNT(*) as count
+                FROM thesis_works
+                WHERE status = 'completed' AND final_grade IS NOT NULL
+                GROUP BY 
+                    CASE 
+                        WHEN final_grade >= 8.5 THEN 'Excellent (8.5-10)'
+                        WHEN final_grade >= 6.5 THEN 'Very Good (6.5-8.4)'
+                        WHEN final_grade >= 5.0 THEN 'Good (5.0-6.4)'
+                        ELSE 'Other'
+                    END
+            ) grade_summary
+            ORDER BY sort_order
         `);
+
+        console.log('✅ Grade distribution query completed');
+
+
+
+        console.log('📊 All statistics queries completed successfully');
 
         res.json({
             general: generalStats.rows[0],
             yearly: yearlyStats.rows,
-            grade_distribution: gradeDistribution.rows,
+            grade_distribution: gradeDistribution.rows.map(row => ({
+                grade_category: row.grade_category,
+                count: row.count
+            })), // Clean up the response to remove sort_order
             generated_at: new Date().toISOString()
         });
 
     } catch (error) {
-        console.error('Get public statistics error:', error);
-        res.status(500).json({ message: 'Failed to load statistics' });
+        console.error('❌ Get public statistics error:', error);
+        res.status(500).json({ 
+            message: 'Failed to load statistics',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 

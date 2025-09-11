@@ -4,6 +4,8 @@ const path = require('path');
 const session = require('express-session');
 require('dotenv').config();
 const { testConnection } = require('./src/config/database');
+const { cachePublicAPI, cacheStaticData } = require('./src/middleware/cache');
+const cacheAdminRoutes = require('./src/routes/cache-admin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
+ 
 // Session configuration
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-here',
@@ -54,6 +56,10 @@ const committeeRoutes = safeRequire('./src/routes/committeeRoute', 'Committee ro
 const fileRoutes = safeRequire('./src/routes/files', 'File routes not found');
 const statusRoutes = safeRequire('./src/routes/status', 'Status routes not found');
 
+app.use('/api/public/announcements', cachePublicAPI);
+app.use('/api/public/statistics', cachePublicAPI); 
+app.use('/api/public/search', cachePublicAPI);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/professor', professorRoutes);
 app.use('/api/student', studentRoutes);
@@ -62,6 +68,8 @@ app.use('/api/public', publicRoutes);
 app.use('/api/committee', committeeRoutes); 
 app.use('/api/files', fileRoutes);
 app.use('/api/status', statusRoutes);
+
+app.use('/api/cache', cacheAdminRoutes);
 
 // Serve main page
 app.get('/', (req, res) => {
