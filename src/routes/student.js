@@ -4,6 +4,7 @@ const express = require('express');
 const { pool } = require('../config/database');
 const { requireAuth, requireStudent, getCurrentUserProfile } = require('../middleware/auth');
 
+
 const router = express.Router();
 
 
@@ -395,5 +396,411 @@ router.get('/thesis/status-history', async (req, res) => {
         res.status(500).json({ message: 'Failed to load status history' });
     }
 });
+
+
+// PRESENTATION SCHEDULING - POST /api/student/schedule-presentation
+
+
+
+router.post('/schedule-presentation', async (req, res) => {
+    try {
+        const { thesis_id, presentation_date, examination_type, room_location, meeting_link } = req.body;
+        const student_id = req.userProfile.student_id;
+
+        console.log('📅 Schedule presentation request:', { thesis_id, examination_type, student_id });
+
+        // Validation: Check if this student owns this thesis
+        const thesisCheck = await pool.query(
+            'SELECT id FROM thesis_works WHERE id = $1 AND student_id = $2',
+            [thesis_id, student_id]
+        );
+
+        if (thesisCheck.rows.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη διπλωματική' 
+            });
+        }
+
+        // Check if presentation already scheduled (update vs insert)
+        const existing = await pool.query(
+            'SELECT id FROM thesis_presentations WHERE thesis_id = $1',
+            [thesis_id]
+        );
+
+        let result;
+        if (existing.rows.length > 0) {
+            // Update existing presentation
+            result = await pool.query(
+                `UPDATE thesis_presentations 
+                 SET presentation_date = $1, examination_type = $2, 
+                     room_location = $3, meeting_link = $4, updated_at = CURRENT_TIMESTAMP
+                 WHERE thesis_id = $5 
+                 RETURNING *`,
+                [presentation_date, examination_type, room_location, meeting_link, thesis_id]
+            );
+        } else {
+            // Insert new presentation
+            result = await pool.query(
+                `INSERT INTO thesis_presentations 
+                 (thesis_id, presentation_date, examination_type, room_location, meeting_link)
+                 VALUES ($1, $2, $3, $4, $5) 
+                 RETURNING *`,
+                [thesis_id, presentation_date, examination_type, room_location, meeting_link]
+            );
+        }
+
+        console.log('✅ Presentation scheduled successfully:', result.rows[0]);
+
+        res.json({
+            success: true,
+            message: 'Η παρουσίαση καταχωρήθηκε επιτυχώς',
+            presentation: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('❌ Schedule presentation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά την καταχώρηση παρουσίασης',
+            error: error.message
+        });
+    }
+});
+
+
+//  EXTERNAL LINKS MANAGEMENT - Multiple endpoints for CRUD operations
+
+
+//  ADD EXTERNAL LINK - POST /api/student/add-external-link
+router.post('/add-external-link', async (req, res) => {
+    try {
+        const { thesis_id, link_url, link_description } = req.body;
+        const student_id = req.userProfile.student_id;
+        const user_id = req.user.id;
+
+        console.log('🔗 Add external link request:', { thesis_id, link_description, student_id });
+
+        // Validation: Check if this student owns this thesis
+        const thesisCheck = await pool.query(
+            'SELECT id FROM thesis_works WHERE id = $1 AND student_id = $2',
+            [thesis_id, student_id]
+        );
+
+        if (thesisCheck.rows.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη διπλωματική' 
+            });
+        }
+
+        // Insert the new link
+        const result = await pool.query(
+            `INSERT INTO thesis_external_links 
+             (thesis_id, link_url, link_description, added_by)
+             VALUES ($1, $2, $3, $4) 
+             RETURNING *`,
+            [thesis_id, link_url, link_description, user_id]
+        );
+
+        console.log('✅ External link added successfully:', result.rows[0]);
+
+        res.json({
+            success: true,
+            message: 'Ο σύνδεσμος προστέθηκε επιτυχώς',
+            link: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('❌ Add external link error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά την προσθήκη συνδέσμου',
+            error: error.message
+        });
+    }
+});
+
+//  GET EXTERNAL LINKS - GET /api/student/external-links/:thesisId
+router.get('/external-links/:thesisId', async (req, res) => {
+    try {
+        const thesisId = req.params.thesisId;
+        const student_id = req.userProfile.student_id;
+
+        console.log('📄 Get external links request:', { thesisId, student_id });
+
+        // Validation: Check if this student owns this thesis
+        const thesisCheck = await pool.query(
+            'SELECT id FROM thesis_works WHERE id = $1 AND student_id = $2',
+            [thesisId, student_id]
+        );
+
+        if (thesisCheck.rows.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη διπλωματική' 
+            });
+        }
+
+        // Get all links for this thesis
+        const result = await pool.query(
+            `SELECT tel.*, u.first_name, u.last_name
+             FROM thesis_external_links tel
+             LEFT JOIN users u ON tel.added_by = u.id
+             WHERE tel.thesis_id = $1
+             ORDER BY tel.added_at DESC`,
+            [thesisId]
+        );
+
+        console.log(`✅ Retrieved ${result.rows.length} external links`);
+
+        res.json(result.rows);
+
+    } catch (error) {
+        console.error('❌ Get external links error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά τη φόρτωση συνδέσμων',
+            error: error.message
+        });
+    }
+});
+
+//  DELETE EXTERNAL LINK - DELETE /api/student/external-links/:linkId
+router.delete('/external-links/:linkId', async (req, res) => {
+    try {
+        const linkId = req.params.linkId;
+        const student_id = req.userProfile.student_id;
+
+        console.log('🗑️ Delete external link request:', { linkId, student_id });
+
+        // Validation: Check if this link belongs to a thesis owned by this student
+        const linkCheck = await pool.query(
+            `SELECT tel.id, tw.student_id
+             FROM thesis_external_links tel
+             JOIN thesis_works tw ON tel.thesis_id = tw.id
+             WHERE tel.id = $1`,
+            [linkId]
+        );
+
+        if (linkCheck.rows.length === 0 || linkCheck.rows[0].student_id !== student_id) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Δεν έχετε δικαίωμα διαγραφής αυτού του συνδέσμου' 
+            });
+        }
+
+        // Delete the link
+        await pool.query('DELETE FROM thesis_external_links WHERE id = $1', [linkId]);
+
+        console.log('✅ External link deleted successfully');
+
+        res.json({
+            success: true,
+            message: 'Ο σύνδεσμος διαγράφηκε επιτυχώς'
+        });
+
+    } catch (error) {
+        console.error('❌ Delete external link error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά τη διαγραφή συνδέσμου',
+            error: error.message
+        });
+    }
+});
+
+
+//  REPOSITORY MANAGEMENT - POST /api/student/update-repository
+
+router.post('/update-repository', async (req, res) => {
+    try {
+        const { thesis_id, repository_link } = req.body;
+        const student_id = req.userProfile.student_id;
+
+        console.log('📚 Update repository request:', { thesis_id, student_id });
+
+        // Validation: Check if this student owns this thesis
+        const thesisCheck = await pool.query(
+            'SELECT id FROM thesis_works WHERE id = $1 AND student_id = $2',
+            [thesis_id, student_id]
+        );
+
+        if (thesisCheck.rows.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Δεν έχετε δικαίωμα πρόσβασης σε αυτή τη διπλωματική' 
+            });
+        }
+
+        // Update the repository link
+        const result = await pool.query(
+            'UPDATE thesis_works SET repository_link = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+            [repository_link, thesis_id]
+        );
+
+        console.log('✅ Repository link updated successfully');
+
+        res.json({
+            success: true,
+            message: 'Ο σύνδεσμος αποθετηρίου ενημερώθηκε επιτυχώς',
+            thesis: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('❌ Update repository error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά την ενημέρωση αποθετηρίου',
+            error: error.message
+        });
+    }
+});
+
+//  PROFILE MANAGEMENT - POST /api/student/update-profile
+
+router.post('/update-profile', async (req, res) => {
+    try {
+        const { phone_mobile, phone_landline, address, contact_email } = req.body;
+        const student_id = req.userProfile.student_id;
+
+        console.log('👤 Update profile request:', { student_id });
+
+        // Update the student profile
+        const result = await pool.query(
+            `UPDATE students 
+             SET phone_mobile = $1, phone_landline = $2, address = $3, 
+                 contact_email = $4, updated_at = CURRENT_TIMESTAMP
+             WHERE id = $5 
+             RETURNING *`,
+            [phone_mobile, phone_landline, address, contact_email, student_id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Το προφίλ φοιτητή δεν βρέθηκε'
+            });
+        }
+
+        console.log('✅ Profile updated successfully');
+
+        res.json({
+            success: true,
+            message: 'Το προφίλ ενημερώθηκε επιτυχώς',
+            student: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('❌ Update profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά την ενημέρωση προφίλ',
+            error: error.message
+        });
+    }
+});
+
+
+//  EXAM REPORT VIEW - GET /api/student/exam-report/:thesisId
+
+router.get('/exam-report/:thesisId', async (req, res) => {
+    try {
+        const thesisId = req.params.thesisId;
+        const student_id = req.userProfile.student_id;
+
+        console.log('📋 Exam report request:', { thesisId, student_id });
+
+        // Validation: Check if this student owns this thesis and it's completed
+        const thesisCheck = await pool.query(
+            `SELECT tw.*, tt.title, tt.description,
+                    CONCAT(supervisor.first_name, ' ', supervisor.last_name) as supervisor_name
+             FROM thesis_works tw
+             JOIN thesis_topics tt ON tw.topic_id = tt.id
+             JOIN professors p ON tw.supervisor_id = p.id
+             JOIN users supervisor ON p.user_id = supervisor.id
+             WHERE tw.id = $1 AND tw.student_id = $2 AND tw.status = 'completed'`,
+            [thesisId, student_id]
+        );
+
+        if (thesisCheck.rows.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Η διπλωματική δεν βρέθηκε ή δεν έχει ολοκληρωθεί' 
+            });
+        }
+
+        const thesis = thesisCheck.rows[0];
+
+        // Get committee members and grades
+        const committeeResult = await pool.query(
+            `SELECT tcm.*, 
+                    CONCAT(u.first_name, ' ', u.last_name) as professor_name,
+                    tg.total_grade, tg.comments
+             FROM thesis_committee_members tcm
+             JOIN professors prof ON tcm.professor_id = prof.id
+             JOIN users u ON prof.user_id = u.id
+             LEFT JOIN thesis_grades tg ON tg.thesis_id = tcm.thesis_id AND tg.professor_id = tcm.professor_id
+             WHERE tcm.thesis_id = $1 AND tcm.status = 'accepted'
+             ORDER BY tcm.role DESC, tcm.id`,
+            [thesisId]
+        );
+
+        // Generate HTML report (simple version)
+        const reportHtml = `
+        <!DOCTYPE html>
+        <html lang="el">
+        <head>
+            <meta charset="UTF-8">
+            <title>Πρακτικό Εξέτασης - ${thesis.title}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 2rem; line-height: 1.6; }
+                .header { text-align: center; margin-bottom: 2rem; }
+                .section { margin: 1rem 0; }
+                .grade { font-weight: bold; color: #2d5aa0; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>ΠΡΑΚΤΙΚΟ ΕΞΕΤΑΣΗΣ ΔΙΠΛΩΜΑΤΙΚΗΣ ΕΡΓΑΣΙΑΣ</h1>
+                <h2>Πανεπιστήμιο Πατρών - Τμήμα Μηχανικών Η/Υ & Πληροφορικής</h2>
+            </div>
+            
+            <div class="section">
+                <h3>Στοιχεία Διπλωματικής</h3>
+                <p><strong>Τίτλος:</strong> ${thesis.title}</p>
+                <p><strong>Φοιτητής:</strong> ${req.userProfile.first_name} ${req.userProfile.last_name}</p>
+                <p><strong>Επιβλέπων:</strong> ${thesis.supervisor_name}</p>
+                <p><strong>Ημερομηνία Ολοκλήρωσης:</strong> ${new Date(thesis.completed_at).toLocaleDateString('el-GR')}</p>
+            </div>
+            
+            <div class="section">
+                <h3>Επιτροπή Εξέτασης</h3>
+                ${committeeResult.rows.map(member => `
+                    <p><strong>${member.professor_name}</strong> (${member.role === 'supervisor' ? 'Επιβλέπων' : 'Μέλος'})
+                    ${member.total_grade ? `<span class="grade">- Βαθμός: ${member.total_grade}/10</span>` : ''}</p>
+                `).join('')}
+            </div>
+            
+            <div class="section">
+                <h3>Τελικός Βαθμός</h3>
+                <p class="grade" style="font-size: 1.2em;">${thesis.final_grade}/10</p>
+            </div>
+        </body>
+        </html>
+        `;
+
+        res.send(reportHtml);
+
+    } catch (error) {
+        console.error('❌ Exam report error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Σφάλμα κατά τη δημιουργία πρακτικού',
+            error: error.message
+        });
+    }
+});
+
 
 module.exports = router;
