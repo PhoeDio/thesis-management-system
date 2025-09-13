@@ -727,9 +727,8 @@
             data: {
                 statistics: null,
                 supervisedTheses: [],
-                committeeParticipations: [],
-                pendingInvitations: [],
-                availableTopics: []
+                committees: [],
+                topics: []
             }
         };
 
@@ -1117,7 +1116,7 @@
         /*
          * FACTORY FUNCTION TO CREATE FILE MANAGERS
          * This function creates and initializes a file manager for a specific thesis
-         * It's designed to be called from anywhere 
+         * It's designed to be called from anywhere in your application
          */
         function createThesisFileManager(thesisId, containerId) {
             const container = document.getElementById(containerId);
@@ -1158,24 +1157,19 @@
 
         // Main initialization function
         async function initializeProfessorDashboard() {
-              try {
-                console.log('🚀 Professor Dashboard Initializing...');
-                
-                // Check authentication first
+            try {
+                // Check if user is authenticated
                 const userResponse = await fetch('/api/auth/me');
                 if (!userResponse.ok) {
-                    console.log('❌ Not authenticated, redirecting to login');
-                    window.location.href = '/test-auth.html'; // or whatever your login page is
+                    // Redirect to login if not authenticated
+                    window.location.href = '/login.html';
                     return;
                 }
 
                 const userData = await userResponse.json();
                 ProfessorApp.currentUser = userData.user;
-                
-                // Update header with professor's name
-                updateUserInfo();
 
-                // Load comprehensive dashboard data
+                // Load initial data
                 await loadDashboardData();
                 
                 console.log('✅ Professor Dashboard Initialized Successfully');
@@ -1188,20 +1182,13 @@
         // Load all dashboard data
         async function loadDashboardData() {
             try {
-                console.log('📊 Loading comprehensive dashboard data...');
-                
                 const response = await fetch('/api/professor/dashboard');
                 const result = await response.json();
 
                 if (result.success) {
-                    // Store all the rich data your API provides
                     ProfessorApp.data = result.data;
-                    
-                    // Update each part of the dashboard with real data
                     updateStatistics(result.data.statistics);
-                    updateDashboardContent(result.data);
-                    
-                    console.log('📊 Dashboard data loaded successfully', result.data);
+                    console.log('📊 Dashboard data loaded successfully');
                 } else {
                     throw new Error(result.message || 'Failed to load dashboard data');
                 }
@@ -1211,191 +1198,14 @@
             }
         }
 
-        function updateUserInfo() {
-            if (ProfessorApp.currentUser) {
-                const { first_name, last_name } = ProfessorApp.currentUser;
-                const userNameElement = document.getElementById('userName');
-                if (userNameElement) {
-                    userNameElement.textContent = `${first_name} ${last_name}`;
-                }
-            }
-        }
-
-        function renderThesisList(theses, role) {
-            if (!theses || theses.length === 0) {
-                return `<div class="empty-state">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-                            <p>Δεν υπάρχουν διπλωματικές εργασίες αυτήν τη στιγμή</p>
-                        </div>`;
-            }
-
-            return theses.map(thesis => {
-                const statusColors = {
-                    'under_assignment': '#f59e0b',
-                    'active': '#10b981', 
-                    'under_examination': '#3b82f6',
-                    'completed': '#059669',
-                    'cancelled': '#ef4444'
-                };
-
-                const statusLabels = {
-                    'under_assignment': 'Υπό Ανάθεση',
-                    'active': 'Ενεργή',
-                    'under_examination': 'Υπό Εξέταση', 
-                    'completed': 'Ολοκληρωμένη',
-                    'cancelled': 'Ακυρωμένη'
-                };
-
-                const statusColor = statusColors[thesis.status] || '#6b7280';
-                const statusLabel = statusLabels[thesis.status] || thesis.status;
-
-                return `
-                    <div class="thesis-item" style="margin-bottom: 1rem; padding: 1rem; border-left: 4px solid ${statusColor}; background: rgba(255,255,255,0.6); border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <div>
-                                <h4 style="margin: 0; color: #2d3748;">${thesis.topic_title || thesis.thesis_title || 'Χωρίς Τίτλο'}</h4>
-                                <div style="color: #666; font-size: 0.9rem; margin-top: 0.25rem;">
-                                    <span>👨‍🎓 ${thesis.student_name}</span>
-                                    <span style="margin-left: 1rem;">(ΑΜ: ${thesis.student_number})</span>
-                                </div>
-                            </div>
-                            <div style="background-color: ${statusColor}; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
-                                ${statusLabel}
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 1rem;">
-                            <button class="btn-secondary" onclick="viewThesisDetails('${thesis.id}')" style="margin-right: 0.5rem; padding: 0.5rem 1rem; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">
-                                👁️ Προβολή
-                            </button>
-                            ${role === 'supervisor' && thesis.status === 'active' ? `
-                                <button class="btn-primary" onclick="changeThesisStatus('${thesis.id}', 'under_examination')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                                    🎯 Μετάβαση σε Εξέταση
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderInvitations(invitations) {
-            if (!invitations || invitations.length === 0) {
-                return `
-                    <div class="empty-state">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📮</div>
-                        <p>Δεν υπάρχουν προσκλήσεις αυτήν τη στιγμή</p>
-                    </div>
-                `;
-            }
-
-            return invitations.map(invitation => `
-                <div class="invitation-item" style="margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.6); border-radius: 8px; border-left: 4px solid #3b82f6;">
-                    <h4 style="margin: 0 0 0.5rem 0; color: #2d3748;">${invitation.thesis_title}</h4>
-                    <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                        <div>📨 Από: ${invitation.supervisor_name}</div>
-                        <div>👨‍🎓 Φοιτητής: ${invitation.student_name} (${invitation.student_number})</div>
-                        <div>📅 ${formatDate(invitation.invited_at)}</div>
-                    </div>
-                    
-                    <div style="margin-top: 1rem;">
-                        <button onclick="respondToInvitation('${invitation.invitation_id}', 'accept')" style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem;">
-                            ✅ Αποδοχή
-                        </button>
-                        <button onclick="respondToInvitation('${invitation.invitation_id}', 'reject')" style="padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                            ❌ Απόρριψη
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderTopics(topics) {
-            if (!topics || topics.length === 0) {
-                return `
-                    <div class="empty-state">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">💡</div>
-                        <p>Δεν υπάρχουν διαθέσιμα θέματα</p>
-                        <button onclick="showCreateTopicForm()" style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                            ➕ Δημιουργία Νέου Θέματος
-                        </button>
-                    </div>
-                `;
-            }
-
-            return topics.map(topic => `
-                <div class="topic-item" style="margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.6); border-radius: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <h4 style="margin: 0; color: #2d3748;">${topic.title}</h4>
-                        <span style="color: #666; font-size: 0.8rem;">📅 ${formatDate(topic.created_at)}</span>
-                    </div>
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${topic.description}</p>
-                    <div>
-                        <button onclick="showAssignTopicForm('${topic.id}', '${topic.title}')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem;">
-                            🎯 Ανάθεση σε Φοιτητή
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            
-            const date = new Date(dateString);
-            return date.toLocaleDateString('el-GR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        function showMessage(message, type = 'info') {
-            // Simple alert for now - you can enhance this with better styling later
-            alert(message);
-        }
-
-        function updateDashboardContent(data) {
-            // Update supervised theses section if it exists
-            const supervisedContainer = document.getElementById('supervisedTheses');
-            if (supervisedContainer && data.supervisedTheses) {
-                supervisedContainer.innerHTML = renderThesisList(data.supervisedTheses, 'supervisor');
-            }
-
-            // Update pending invitations if the container exists
-            const invitationsContainer = document.getElementById('pendingInvitations');
-            if (invitationsContainer && data.pendingInvitations) {
-                invitationsContainer.innerHTML = renderInvitations(data.pendingInvitations);
-            }
-
-            // Update available topics if the container exists
-            const topicsContainer = document.getElementById('availableTopics');
-            if (topicsContainer && data.availableTopics) {
-                topicsContainer.innerHTML = renderTopics(data.availableTopics);
-            }
-        }
-
         // Update statistics display
         function updateStatistics(stats) {
             if (!stats) return;
 
-            console.log('📈 Updating statistics:', stats);
-
-            // Update the main statistic cards in your dashboard
-            const elements = {
-                'totalSupervised': stats.totalSupervised || 0,
-                'activeTheses': stats.activeTheses || 0,
-                'completedTheses': stats.completedTheses || 0,
-                'committeeParticipations': stats.committeeParticipations || 0
-            };
-
-            // Update each element if it exists in your HTML
-            Object.entries(elements).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
-            });
+            document.getElementById('totalSupervised').textContent = stats.totalSupervised || 0;
+            document.getElementById('activeTheses').textContent = stats.activeTheses || 0;
+            document.getElementById('completedTheses').textContent = stats.completedTheses || 0;
+            document.getElementById('committeeParticipations').textContent = stats.committeeParticipations || 0;
         }
 
         /*
@@ -1409,10 +1219,7 @@
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            const clickedTab = event.target.closest('.nav-tab');
-            if (clickedTab) {
-                clickedTab.classList.add('active');
-            }
+            event.target.classList.add('active');
 
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -1420,11 +1227,7 @@
             });
 
             // Show selected tab
-            const targetTab = document.getElementById(`${tabName}-tab`);
-            if (targetTab) {
-                targetTab.classList.add('active');
-                ProfessorApp.currentTab = tabName;
-            }
+            document.getElementById(`${tabName}-tab`).classList.add('active');
             
             // Load data for the selected tab
             ProfessorApp.currentTab = tabName;
@@ -1444,8 +1247,6 @@
                     break;
             }
         }
-
-        
 
         /*
          * DATA LOADING FUNCTIONS FOR EACH TAB
@@ -1560,61 +1361,6 @@
                 if (fileManager) {
                     fileManager.loadFiles();
                 }
-            }
-        }
-
-        async function respondToInvitation(invitationId, response) {
-            try {
-                const result = await fetch('/api/professor/respond-invitation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        invitation_id: invitationId,
-                        response: response
-                    })
-                });
-
-                const data = await result.json();
-                
-                if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Respond invitation error:', error);
-                showMessage('Σφάλμα κατά την απόκριση', 'error');
-            }
-        }
-
-        async function changeThesisStatus(thesisId, newStatus) {
-            const reason = prompt(`Λόγος αλλαγής κατάστασης σε "${newStatus}":`);
-            
-            if (reason === null) return; // User cancelled
-
-            try {
-                const result = await fetch('/api/professor/change-thesis-status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        thesis_id: thesisId,
-                        new_status: newStatus,
-                        reason: reason
-                    })
-                });
-
-                const data = await result.json();
-                
-                if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Change status error:', error);
-                showMessage('Σφάλμα κατά την αλλαγή κατάστασης', 'error');
             }
         }
 
@@ -1804,84 +1550,7 @@
 
         // View thesis details
         function viewThesisDetails(thesisId) {
-            // Simple alert for now - you can enhance this later
-            alert(`Προβολή λεπτομερειών για thesis ID: ${thesisId}`);
-            // TODO: Implement detailed view modal
-        }
-
-        function showCreateTopicForm() {
-            // Simple prompt for now - you can enhance this with a proper modal later
-            const title = prompt('Εισάγετε τον τίτλο του θέματος (τουλάχιστον 10 χαρακτήρες):');
-            if (!title || title.length < 10) {
-                alert('Ο τίτλος πρέπει να έχει τουλάχιστον 10 χαρακτήρες');
-                return;
-            }
-            
-            const description = prompt('Εισάγετε την περιγραφή (τουλάχιστον 50 χαρακτήρες):');
-            if (!description || description.length < 50) {
-                alert('Η περιγραφή πρέπει να έχει τουλάχιστον 50 χαρακτήρες');
-                return;
-            }
-            
-            createTopic(title, description);
-        }
-
-        async function createTopic(title, description) {
-            try {
-                const result = await fetch('/api/professor/create-topic', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: title,
-                        description: description
-                    })
-                });
-
-                const data = await result.json();
-                
-                if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Create topic error:', error);
-                showMessage('Σφάλμα κατά τη δημιουργία θέματος', 'error');
-            }
-        }
-
-        async function assignTopic(topicId, studentIdentifier) {
-            try {
-                const result = await fetch('/api/professor/assign-topic', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        topic_id: topicId,
-                        student_identifier: studentIdentifier
-                    })
-                });
-
-                const data = await result.json();
-                
-                if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
-                } else {
-                    showMessage(data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Assign topic error:', error);
-                showMessage('Σφάλμα κατά την ανάθεση θέματος', 'error');
-            }
-        }
-
-        function showAssignTopicForm(topicId, topicTitle) {
-            // Simple prompt for now
-            const studentIdentifier = prompt(`Ανάθεση του θέματος "${topicTitle}"\n\nΕισάγετε τον αριθμό μητρώου ή το όνομα του φοιτητή:`);
-            if (!studentIdentifier) return;
-            
-            assignTopic(topicId, studentIdentifier);
+            showMessage('Προβολή λεπτομερειών - λειτουργία υπό ανάπτυξη', 'info');
         }
 
         // Edit topic
