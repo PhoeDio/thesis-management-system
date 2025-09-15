@@ -596,6 +596,682 @@
                 align-self: flex-start;
             }
         }
+
+
+        /* ========================================
+        ENHANCED MODAL STYLES FOR PROFESSOR DASHBOARD
+        ======================================== */
+
+        /* Modal Overlay - The dark background that appears behind modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        /* Modal Content Container */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 0;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+
+        /* Larger modals for detailed views */
+        .large-modal {
+            max-width: 800px;
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 2rem 2rem 1rem 2rem;
+            border-bottom: 2px solid rgba(240, 242, 245, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-icon {
+            font-size: 1.3rem;
+        }
+
+        /* Modal Close Button */
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+
+        /* Form Sections and Groups */
+        .form-section {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .label-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Form Inputs */
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.8);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Form Help Text */
+        .form-help {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .search-help-list {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            list-style: none;
+        }
+
+        .search-help-list li {
+            margin: 0.25rem 0;
+            font-size: 0.85rem;
+        }
+
+        /* Character Counter */
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        /* Form Actions (Buttons at bottom of modals) */
+        .form-actions {
+            padding: 1.5rem 2rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            border-top: 2px solid rgba(240, 242, 245, 0.8);
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 0 0 20px 20px;
+        }
+
+        /* Enhanced Button Styles */
+        .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-download {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 101, 101, 0.4);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn-icon {
+            font-size: 1rem;
+        }
+
+        /* Topic Preview Section */
+        .topic-preview {
+            margin: 1.5rem 2rem;
+            padding: 1.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .topic-preview-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .preview-icon {
+            font-size: 1.1rem;
+        }
+
+        .topic-preview-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+
+        /* Thesis Details Content */
+        .thesis-details-content {
+            padding: 1rem 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .details-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(240, 242, 245, 0.8);
+        }
+
+        .details-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h4 {
+            margin: 0;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .section-header h5 {
+            margin: 1rem 0 0.5rem 0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .section-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Details Grid for organized information display */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #374151;
+            font-weight: 600;
+        }
+
+        /* Description Section */
+        .description-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(240, 242, 245, 0.8);
+        }
+
+        .thesis-description {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-badge.large {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Committee Members */
+        .committee-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .committee-member-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-spec {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .member-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .member-status.status-accepted {
+            background: rgba(72, 187, 120, 0.1);
+            color: #38a169;
+        }
+
+        .member-status.status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d69e2e;
+        }
+
+        .member-status.status-rejected {
+            background: rgba(245, 101, 101, 0.1);
+            color: #e53e3e;
+        }
+
+        /* Notes and Files Lists */
+        .notes-list, .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .note-item, .file-item {
+            padding: 1rem;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .note-content {
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-date {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        /* Modal Actions (bottom buttons in modals) */
+        .modal-actions {
+            padding: 1.5rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            border-top: 2px solid rgba(240, 242, 245, 0.8);
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 0 0 20px 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Empty State Messages */
+        .empty-message {
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        /* Loading State for Modal Content */
+        .loading-state {
+            padding: 3rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .large-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem auto;
+        }
+
+        /* Enhanced Toast Messages */
+        .toast-message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 10000;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 400px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        .toast-warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design for Modals */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+            
+            .large-modal {
+                max-width: 95%;
+            }
+            
+            .modal-header {
+                padding: 1.5rem 1.5rem 1rem 1.5rem;
+            }
+            
+            .modal-header h3 {
+                font-size: 1.2rem;
+            }
+            
+            .form-section {
+                padding: 1.5rem;
+            }
+            
+            .thesis-details-content {
+                padding: 1rem 1.5rem;
+            }
+            
+            .form-actions, .modal-actions {
+                padding: 1rem 1.5rem 1.5rem 1.5rem;
+                flex-direction: column;
+            }
+            
+            .form-actions button, .modal-actions button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .committee-member-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .toast-message {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        
+
     </style>
 </head>
 <body>
@@ -1803,85 +2479,570 @@
         }
 
         // View thesis details
-        function viewThesisDetails(thesisId) {
-            // Simple alert for now - you can enhance this later
-            alert(`Προβολή λεπτομερειών για thesis ID: ${thesisId}`);
-            // TODO: Implement detailed view modal
+        async function viewThesisDetails(thesisId) {
+            console.log('👁️ Loading thesis details for ID:', thesisId);
+            
+            // Show loading modal first
+            const loadingModalHtml = `
+                <div class="modal-overlay" id="thesisDetailsModal">
+                    <div class="modal-content">
+                        <div class="loading-state">
+                            <div class="spinner large-spinner"></div>
+                            <p>Φόρτωση λεπτομερειών διπλωματικής...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', loadingModalHtml);
+            
+            try {
+                const response = await fetch(`/api/professor/thesis/${thesisId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayThesisDetailsModal(result.thesis, result.committee, result.notes, result.files);
+                } else {
+                    closeModal();
+                    showMessage(`❌ ${result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('View thesis details error:', error);
+                closeModal();
+                showMessage('Σφάλμα φόρτωσης λεπτομερειών', 'error');
+            }
         }
+
+        function displayThesisDetailsModal(thesis, committee, notes, files) {
+            const modal = document.getElementById('thesisDetailsModal');
+            
+            const statusLabels = {
+                'under_assignment': 'Υπό Ανάθεση',
+                'active': 'Ενεργή',
+                'under_examination': 'Υπό Εξέταση',
+                'completed': 'Ολοκληρωμένη',
+                'cancelled': 'Ακυρωμένη'
+            };
+            
+            const statusColors = {
+                'under_assignment': '#f59e0b',
+                'active': '#10b981',
+                'under_examination': '#3b82f6', 
+                'completed': '#059669',
+                'cancelled': '#ef4444'
+            };
+            
+            const modalContent = `
+                <div class="modal-content large-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><span class="modal-icon">📚</span> Λεπτομέρειες Διπλωματικής Εργασίας</h3>
+                        <button class="modal-close-btn" onclick="closeModal()">×</button>
+                    </div>
+                    
+                    <div class="thesis-details-content">
+                        <!-- Thesis Overview -->
+                        <div class="details-section">
+                            <div class="section-header">
+                                <h4><span class="section-icon">📋</span> Γενικές Πληροφορίες</h4>
+                                <div class="status-badge large" style="background-color: ${statusColors[thesis.status]}">
+                                    ${statusLabels[thesis.status]}
+                                </div>
+                            </div>
+                            
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">📚 Τίτλος:</span>
+                                    <span class="detail-value">${thesis.title}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">👨‍🎓 Φοιτητής:</span>
+                                    <span class="detail-value">${thesis.student_name} (${thesis.student_number})</span>
+                                </div>
+                                ${thesis.phone_mobile ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">📱 Τηλέφωνο:</span>
+                                    <span class="detail-value">${thesis.phone_mobile}</span>
+                                </div>
+                                ` : ''}
+                                ${thesis.contact_email ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">📧 Email:</span>
+                                    <span class="detail-value">${thesis.contact_email}</span>
+                                </div>
+                                ` : ''}
+                                ${thesis.assigned_at ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">📅 Ημ. Ανάθεσης:</span>
+                                    <span class="detail-value">${formatDate(thesis.assigned_at)}</span>
+                                </div>
+                                ` : ''}
+                                ${thesis.activated_at ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">🚀 Ημ. Ενεργοποίησης:</span>
+                                    <span class="detail-value">${formatDate(thesis.activated_at)}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${thesis.description ? `
+                            <div class="description-section">
+                                <h5><span class="section-icon">📖</span> Περιγραφή Θέματος</h5>
+                                <p class="thesis-description">${thesis.description}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Committee Section -->
+                        <div class="details-section">
+                            <h4><span class="section-icon">👥</span> Τριμελής Επιτροπή</h4>
+                            <div class="committee-list">
+                                ${committee.length > 0 ? committee.map(member => `
+                                    <div class="committee-member-card">
+                                        <div class="member-info">
+                                            <div class="member-name">${member.professor_name}</div>
+                                            <div class="member-role">${member.role === 'supervisor' ? 'Επιβλέπων' : 'Μέλος Επιτροπής'}</div>
+                                            ${member.specialization ? `<div class="member-spec">${member.specialization}</div>` : ''}
+                                        </div>
+                                        <div class="member-status status-${member.status}">
+                                            ${member.status === 'accepted' ? '✅ Αποδοχή' : 
+                                            member.status === 'pending' ? '⏳ Εκκρεμεί' : '❌ Απόρριψη'}
+                                        </div>
+                                    </div>
+                                `).join('') : '<p class="empty-message">Δεν έχουν οριστεί μέλη επιτροπής</p>'}
+                            </div>
+                        </div>
+                        
+                        <!-- Notes Section -->
+                        ${notes.length > 0 ? `
+                        <div class="details-section">
+                            <h4><span class="section-icon">📝</span> Οι Σημειώσεις σας</h4>
+                            <div class="notes-list">
+                                ${notes.map(note => `
+                                    <div class="note-item">
+                                        <div class="note-content">${note.note_text}</div>
+                                        <div class="note-date">${formatDate(note.created_at)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Files Section -->
+                        ${files.length > 0 ? `
+                        <div class="details-section">
+                            <h4><span class="section-icon">📎</span> Αρχεία Διπλωματικής</h4>
+                            <div class="files-list">
+                                ${files.map(file => `
+                                    <div class="file-item">
+                                        <div class="file-info">
+                                            <div class="file-name">${file.file_name}</div>
+                                            <div class="file-meta">${formatDate(file.uploaded_at)}</div>
+                                        </div>
+                                        <button class="btn-download" onclick="downloadFile('${file.id}', '${thesis.id}')">
+                                            📥 Λήψη
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="modal-actions">
+                        ${thesis.is_supervisor && thesis.status === 'active' ? `
+                            <button class="btn-primary" onclick="changeThesisStatus('${thesis.id}', 'under_examination')">
+                                🎯 Μετάβαση σε Εξέταση
+                            </button>
+                        ` : ''}
+                        <button class="btn-secondary" onclick="addNoteFromModal('${thesis.id}')">
+                            📝 Προσθήκη Σημείωσης
+                        </button>
+                        <button class="btn-secondary" onclick="closeModal()">
+                            ❌ Κλείσιμο
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.innerHTML = modalContent;
+        }
+
+        function closeModal() {
+            const modals = document.querySelectorAll('.modal-overlay');
+            modals.forEach(modal => {
+                modal.style.animation = 'fadeOut 0.2s ease-out forwards';
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.remove();
+                    }
+                }, 200);
+            });
+        }
+
+        function addNoteFromModal(thesisId) {
+            const noteText = prompt('Εισάγετε τη σημείωση (μέγιστο 300 χαρακτήρες):');
+            
+            if (!noteText || noteText.trim().length === 0) {
+                return;
+            }
+
+            if (noteText.length > 300) {
+                showMessage('Η σημείωση δεν μπορεί να υπερβαίνει τους 300 χαρακτήρες', 'error');
+                return;
+            }
+
+            addNote(thesisId, noteText.trim());
+        }
+
+        async function addNote(thesisId, noteText = null) {
+            try {
+                // If no note text provided, prompt for it
+                if (!noteText) {
+                    noteText = prompt('Εισάγετε τη σημείωση (μέγιστο 300 χαρακτήρες):');
+                    
+                    if (!noteText || noteText.trim().length === 0) {
+                        return;
+                    }
+
+                    if (noteText.length > 300) {
+                        showMessage('Η σημείωση δεν μπορεί να υπερβαίνει τους 300 χαρακτήρες', 'error');
+                        return;
+                    }
+                    
+                    noteText = noteText.trim();
+                }
+                
+                console.log('📝 Adding note to thesis:', thesisId);
+                
+                const result = await fetch('/api/professor/add-note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        thesis_id: thesisId,
+                        note_text: noteText
+                    })
+                });
+
+                const data = await result.json();
+                
+                if (data.success) {
+                    showMessage(`✅ ${data.message}`, 'success');
+                    // Refresh thesis details if modal is open
+                    if (document.getElementById('thesisDetailsModal')) {
+                        viewThesisDetails(thesisId);
+                    }
+                } else {
+                    showMessage(`❌ ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Add note error:', error);
+                showMessage('Σφάλμα κατά την προσθήκη σημείωσης', 'error');
+            }
+        }
+
 
         function showCreateTopicForm() {
-            // Simple prompt for now - you can enhance this with a proper modal later
-            const title = prompt('Εισάγετε τον τίτλο του θέματος (τουλάχιστον 10 χαρακτήρες):');
-            if (!title || title.length < 10) {
-                alert('Ο τίτλος πρέπει να έχει τουλάχιστον 10 χαρακτήρες');
-                return;
-            }
+            console.log('📝 Opening create topic form...');
             
-            const description = prompt('Εισάγετε την περιγραφή (τουλάχιστον 50 χαρακτήρες):');
-            if (!description || description.length < 50) {
-                alert('Η περιγραφή πρέπει να έχει τουλάχιστον 50 χαρακτήρες');
-                return;
-            }
+            // Create comprehensive modal with proper validation and styling
+            const modalHtml = `
+                <div class="modal-overlay" id="createTopicModal" onclick="closeModal()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3><span class="modal-icon">💡</span> Δημιουργία Νέου Θέματος Διπλωματικής</h3>
+                            <button class="modal-close-btn" onclick="closeModal()" title="Κλείσιμο">×</button>
+                        </div>
+                        
+                        <form id="createTopicForm" onsubmit="createTopic(event)">
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="topicTitle" class="form-label">
+                                        <span class="label-icon">📋</span>
+                                        Τίτλος Θέματος *
+                                    </label>
+                                    <input type="text" 
+                                        id="topicTitle" 
+                                        class="form-input" 
+                                        required 
+                                        minlength="10" 
+                                        maxlength="200"
+                                        placeholder="Εισάγετε έναν περιγραφικό τίτλο (τουλάχιστον 10 χαρακτήρες)">
+                                    <div class="form-help">
+                                        Ο τίτλος πρέπει να είναι σαφής και περιγραφικός για τους φοιτητές
+                                    </div>
+                                    <div class="char-counter">
+                                        <span id="titleCounter">0</span>/200 χαρακτήρες
+                                    </div>
+                                </div>
+                            
+                                <div class="form-group">
+                                    <label for="topicDescription" class="form-label">
+                                        <span class="label-icon">📖</span>
+                                        Περιγραφή Θέματος *
+                                    </label>
+                                    <textarea id="topicDescription" 
+                                            class="form-textarea" 
+                                            required 
+                                            minlength="50" 
+                                            maxlength="2000"
+                                            rows="6"
+                                            placeholder="Περιγράψτε λεπτομερώς το θέμα, τους στόχους, τις τεχνολογίες που θα χρησιμοποιηθούν και τα αναμενόμενα αποτελέσματα..."></textarea>
+                                    <div class="form-help">
+                                        Μια πλήρης περιγραφή βοηθά τους φοιτητές να κατανοήσουν το θέμα καλύτερα
+                                    </div>
+                                    <div class="char-counter">
+                                        <span id="descCounter">0</span>/2000 χαρακτήρες
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="topicKeywords" class="form-label">
+                                        <span class="label-icon">🏷️</span>
+                                        Λέξεις Κλειδιά (προαιρετικό)
+                                    </label>
+                                    <input type="text" 
+                                        id="topicKeywords" 
+                                        class="form-input" 
+                                        placeholder="π.χ. machine learning, web development, database design">
+                                    <div class="form-help">
+                                        Διαχωρίστε τις λέξεις κλειδιά με κόμματα
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="closeModal()">
+                                    <span class="btn-icon">❌</span>
+                                    Ακύρωση
+                                </button>
+                                <button type="submit" class="btn-primary" id="createTopicBtn">
+                                    <span class="btn-icon">💡</span>
+                                    Δημιουργία Θέματος
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
             
-            createTopic(title, description);
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Add character counters with real-time updates
+            const titleInput = document.getElementById('topicTitle');
+            const descInput = document.getElementById('topicDescription');
+            const titleCounter = document.getElementById('titleCounter');
+            const descCounter = document.getElementById('descCounter');
+            
+            titleInput.addEventListener('input', () => {
+                titleCounter.textContent = titleInput.value.length;
+                titleCounter.style.color = titleInput.value.length < 10 ? '#ef4444' : '#10b981';
+            });
+            
+            descInput.addEventListener('input', () => {
+                descCounter.textContent = descInput.value.length;
+                descCounter.style.color = descInput.value.length < 50 ? '#ef4444' : '#10b981';
+            });
+            
+            // Focus on first input for better user experience
+            setTimeout(() => titleInput.focus(), 100);
         }
-
-        async function createTopic(title, description) {
+        
+        async function createTopic(event) {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('createTopicBtn');
+            const originalButtonContent = submitButton.innerHTML;
+            
             try {
+                // Show loading state
+                submitButton.innerHTML = '<span class="btn-icon">⏳</span> Δημιουργία...';
+                submitButton.disabled = true;
+                
+                const title = document.getElementById('topicTitle').value.trim();
+                const description = document.getElementById('topicDescription').value.trim();
+                const keywords = document.getElementById('topicKeywords').value.trim();
+                
+                // Client-side validation with helpful messages
+                if (title.length < 10) {
+                    showMessage('Ο τίτλος πρέπει να έχει τουλάχιστον 10 χαρακτήρες', 'error');
+                    return;
+                }
+                
+                if (description.length < 50) {
+                    showMessage('Η περιγραφή πρέπει να έχει τουλάχιστον 50 χαρακτήρες', 'error');
+                    return;
+                }
+                
+                console.log('📝 Creating topic with data:', { title: title.substring(0, 30) + '...', description: description.length + ' chars' });
+                
                 const result = await fetch('/api/professor/create-topic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: title,
-                        description: description
+                        description: description,
+                        keywords: keywords || null
                     })
                 });
 
                 const data = await result.json();
                 
                 if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
+                    showMessage(`✅ ${data.message}`, 'success');
+                    closeModal();
+                    await loadDashboardData(); // Refresh to show the new topic
                 } else {
-                    showMessage(data.message, 'error');
+                    showMessage(`❌ ${data.message}`, 'error');
                 }
             } catch (error) {
                 console.error('Create topic error:', error);
-                showMessage('Σφάλμα κατά τη δημιουργία θέματος', 'error');
+                showMessage('Σφάλμα σύνδεσης. Παρακαλώ δοκιμάστε ξανά.', 'error');
+            } finally {
+                // Restore button state
+                submitButton.innerHTML = originalButtonContent;
+                submitButton.disabled = false;
             }
         }
 
-        async function assignTopic(topicId, studentIdentifier) {
+        async function assignTopic(event, topicId) {
+            event.preventDefault();
+            
+            const submitButton = document.getElementById('assignTopicBtn');
+            const originalButtonContent = submitButton.innerHTML;
+            
             try {
+                submitButton.innerHTML = '<span class="btn-icon">⏳</span> Ανάθεση...';
+                submitButton.disabled = true;
+                
+                const studentIdentifier = document.getElementById('studentSearch').value.trim();
+                const notes = document.getElementById('assignmentNotes').value.trim();
+                
+                if (!studentIdentifier) {
+                    showMessage('Παρακαλώ εισάγετε στοιχεία φοιτητή', 'error');
+                    return;
+                }
+                
+                console.log('🎯 Assigning topic to student:', studentIdentifier);
+                
                 const result = await fetch('/api/professor/assign-topic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         topic_id: topicId,
-                        student_identifier: studentIdentifier
+                        student_identifier: studentIdentifier,
+                        notes: notes || null
                     })
                 });
 
                 const data = await result.json();
                 
                 if (data.success) {
-                    showMessage(data.message, 'success');
-                    await loadDashboardData(); // Refresh the dashboard
+                    showMessage(`✅ ${data.message}`, 'success');
+                    closeModal();
+                    await loadDashboardData(); // Refresh dashboard
                 } else {
-                    showMessage(data.message, 'error');
+                    showMessage(`❌ ${data.message}`, 'error');
                 }
             } catch (error) {
                 console.error('Assign topic error:', error);
-                showMessage('Σφάλμα κατά την ανάθεση θέματος', 'error');
+                showMessage('Σφάλμα κατά την ανάθεση. Δοκιμάστε ξανά.', 'error');
+            } finally {
+                submitButton.innerHTML = originalButtonContent;
+                submitButton.disabled = false;
             }
         }
 
         function showAssignTopicForm(topicId, topicTitle) {
-            // Simple prompt for now
-            const studentIdentifier = prompt(`Ανάθεση του θέματος "${topicTitle}"\n\nΕισάγετε τον αριθμό μητρώου ή το όνομα του φοιτητή:`);
-            if (!studentIdentifier) return;
+            console.log('🎯 Opening assign topic form for:', topicTitle);
             
-            assignTopic(topicId, studentIdentifier);
+            const modalHtml = `
+                <div class="modal-overlay" id="assignTopicModal" onclick="closeModal()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h3><span class="modal-icon">🎯</span> Ανάθεση Θέματος σε Φοιτητή</h3>
+                            <button class="modal-close-btn" onclick="closeModal()" title="Κλείσιμο">×</button>
+                        </div>
+                        
+                        <div class="topic-preview">
+                            <div class="topic-preview-header">
+                                <span class="preview-icon">📚</span>
+                                <strong>Θέμα προς Ανάθεση:</strong>
+                            </div>
+                            <div class="topic-preview-title">${topicTitle}</div>
+                        </div>
+                        
+                        <form id="assignTopicForm" onsubmit="assignTopic(event, '${topicId}')">
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="studentSearch" class="form-label">
+                                        <span class="label-icon">👨‍🎓</span>
+                                        Αναζήτηση Φοιτητή *
+                                    </label>
+                                    <input type="text" 
+                                        id="studentSearch" 
+                                        class="form-input" 
+                                        required 
+                                        placeholder="Εισάγετε αριθμό μητρώου (π.χ. ΑΜ2024001) ή όνομα φοιτητή">
+                                    <div class="form-help">
+                                        <div>💡 <strong>Τρόποι αναζήτησης:</strong></div>
+                                        <ul class="search-help-list">
+                                            <li>• Αριθμός Μητρώου: AM2024001, 2024001</li>
+                                            <li>• Πλήρες όνομα: Ιωάννης Παπαδόπουλος</li>
+                                            <li>• Όνομα ή επώνυμο: Ιωάννης, Παπαδόπουλος</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div id="studentSearchResults" class="search-results" style="display: none;">
+                                        <!-- Search results will appear here -->
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="assignmentNotes" class="form-label">
+                                        <span class="label-icon">📝</span>
+                                        Σημειώσεις Ανάθεσης (προαιρετικό)
+                                    </label>
+                                    <textarea id="assignmentNotes" 
+                                            class="form-textarea" 
+                                            rows="3"
+                                            maxlength="500"
+                                            placeholder="Τυχόν ειδικές οδηγίες ή προαπαιτούμενα για τον φοιτητή..."></textarea>
+                                    <div class="char-counter">
+                                        <span id="notesCounter">0</span>/500 χαρακτήρες
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="closeModal()">
+                                    <span class="btn-icon">❌</span>
+                                    Ακύρωση
+                                </button>
+                                <button type="submit" class="btn-primary" id="assignTopicBtn">
+                                    <span class="btn-icon">🎯</span>
+                                    Ανάθεση Θέματος
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Add character counter for notes
+            const notesInput = document.getElementById('assignmentNotes');
+            const notesCounter = document.getElementById('notesCounter');
+            
+            notesInput.addEventListener('input', () => {
+                notesCounter.textContent = notesInput.value.length;
+            });
+            
+            // Focus on search input
+            setTimeout(() => document.getElementById('studentSearch').focus(), 100);
         }
 
         // Edit topic
@@ -1924,32 +3085,67 @@
          * MESSAGE SYSTEM
          * This system shows notifications to users
          */
-        function showMessage(text, type = 'info') {
-            // Remove existing toasts
-            const existingToasts = document.querySelectorAll('.toast');
-            existingToasts.forEach(toast => toast.remove());
-
-            // Create new toast
+        function showMessage(message, type = 'info', duration = 5000) {
+            console.log(`📢 ${type.toUpperCase()}: ${message}`);
+            
+            // Remove any existing messages first
+            const existingMessages = document.querySelectorAll('.toast-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            const iconMap = {
+                success: '✅',
+                error: '❌', 
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            const colorMap = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b', 
+                info: '#3b82f6'
+            };
+            
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
+            toast.className = `toast-message toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 10000;
+                background: ${colorMap[type]};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(20px);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out forwards;
+                font-weight: 500;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            `;
+            
             toast.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="font-size: 1.2rem;">
-                        ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
-                    </span>
-                    <span>${text}</span>
-                </div>
+                <span style="font-size: 1.2rem;">${iconMap[type]}</span>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" 
+                        style="background: none; border: none; color: white; font-size: 1.2rem; margin-left: auto; cursor: pointer; opacity: 0.7; hover: opacity: 1;">×</button>
             `;
             
             document.body.appendChild(toast);
             
-            // Auto-remove after 5 seconds
+            // Auto-remove after specified duration
             setTimeout(() => {
                 if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
+                    toast.style.animation = 'slideOutRight 0.3s ease-out forwards';
+                    setTimeout(() => toast.remove(), 300);
                 }
-            }, 5000);
+            }, duration);
         }
+
 
         // Initialize dynamic CSS injection for the file manager component
         const fileManagerCSS = `
