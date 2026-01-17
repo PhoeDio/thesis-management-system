@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Καθηγητής - Διαχείριση Διπλωματικών</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-info h1 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .header-info p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            gap: 0.5rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-tab {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .card-title {
+            color: #2d3748;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .thesis-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .thesis-item {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .thesis-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .thesis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .thesis-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            flex: 1;
+        }
+
+        .thesis-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-under-examination {
+            background: #fed7e2;
+            color: #742a2a;
+        }
+
+        .status-completed {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .status-under-assignment {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .status-cancelled {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .student-info {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .thesis-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .thesis-file-section {
+            margin-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .toast.warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* File Manager Component Styles */
+        .file-manager-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .file-upload-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-icon {
+            font-size: 1.2rem;
+        }
+
+        .file-upload-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .upload-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .file-list-container {
+            margin-top: 1rem;
+        }
+
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .file-count {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 1px solid #cbd5e0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #f7fafc;
+            border-color: #a0aec0;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 1.2rem;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .file-action {
+            background: none;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-action.download {
+            color: #667eea;
+        }
+
+        .file-action.download:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-action.delete {
+            color: #f56565;
+        }
+
+        .file-action.delete:hover {
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .thesis-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .thesis-status {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-info">
+                    <h1>👨‍🏫 Καθηγητής - Διαχείριση Διπλωματικών</h1>
+                    <p>Διαχειριστείτε τις διπλωματικές εργασίες και την επίβλεψή σας</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn secondary" onclick="viewProfile()">
+                        👤 Προφίλ
+                    </button>
+                    <button class="btn" onclick="logout()">
+                        🚪 Αποσύνδεση
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">
+                📊 Επισκόπηση
+            </button>
+            <button class="nav-tab" onclick="switchTab('supervised')">
+                📝 Επιβλεπόμενες
+            </button>
+            <button class="nav-tab" onclick="switchTab('committee')">
+                👥 Επιτροπές
+            </button>
+            <button class="nav-tab" onclick="switchTab('topics')">
+                💡 Θέματα
+            </button>
+        </nav>
+
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h2 class="card-title">Στατιστικά Στοιχεία</h2>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalSupervised">-</div>
+                            <div class="stat-label">Επιβλεπόμενες Εργασίες</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="activeTheses">-</div>
+                            <div class="stat-label">Ενεργές Εργασίες</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="completedTheses">-</div>
+                            <div class="stat-label">Ολοκληρωμένες</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="committeeParticipations">-</div>
+                            <div class="stat-label">Συμμετοχές σε Επιτροπές</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supervised Tab -->
+        <div id="supervised-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Επιβλεπόμενες Διπλωματικές Εργασίες</h2>
+                </div>
+                <div class="card-content">
+                    <div id="supervisedTheses">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Φόρτωση επιβλεπόμενων εργασιών...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Committee Tab -->
+        <div id="committee-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👥</div>
+                    <h2 class="card-title">Συμμετοχή σε Επιτροπές</h2>
+                </div>
+                <div class="card-content">
+                    <div id="committeeParticipation">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Φόρτωση επιτροπών...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics Tab -->
+        <div id="topics-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">💡</div>
+                    <h2 class="card-title">Θέματα Διπλωματικών Εργασιών</h2>
+                </div>
+                <div class="card-content">
+                    <div id="thesisTopics">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Φόρτωση θεμάτων...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Application State - This keeps track of everything happening in our app
+        const ProfessorApp = {
+            currentUser: null,
+            currentTab: 'overview',
+            data: {
+                statistics: null,
+                supervisedTheses: [],
+                committees: [],
+                topics: []
+            }
+        };
+
+        /* 
+         * COMPLETE THESIS FILE MANAGER CLASS
+         * This is the heart of our file management system. It's designed to work 
+         * independently for each thesis, which is crucial for professors who 
+         * supervise multiple students simultaneously.
+         */
+        class ThesisFileManager {
+            constructor(thesisId) {
+                // Each file manager is tied to a specific thesis
+                this.thesisId = thesisId;
+                this.files = [];
+                this.uploadInProgress = false;
+                
+                // We'll track the container element for this specific thesis
+                this.containerId = `professorFileManager-${thesisId}`;
+            }
+
+            // Create the complete HTML interface for file management
+            createFileUploadHTML() {
+                return `
+                    <div class="file-manager-section">
+                        <div class="file-upload-header">
+                            <h3 class="section-title">
+                                <span class="section-icon">📁</span>
+                                Διαχείριση Αρχείων
+                            </h3>
+                        </div>
+
+                        <!-- File Upload Area with drag and drop support -->
+                        <div class="file-upload-container">
+                            <div class="upload-area" id="uploadArea-${this.thesisId}" onclick="document.getElementById('fileInput-${this.thesisId}').click()">
+                                <div class="upload-icon">📤</div>
+                                <div class="upload-text">
+                                    <strong>Κάντε κλικ για να επιλέξετε αρχεία</strong><br>
+                                    ή σύρετε και αφήστε τα εδώ
+                                </div>
+                                <div class="upload-info">
+                                    Υποστηριζόμενα: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, ZIP, εικόνες<br>
+                                    Μέγιστο μέγεθος: 10GB ανά αρχείο
+                                </div>
+                            </div>
+                            <input type="file" id="fileInput-${this.thesisId}" class="file-input" multiple 
+                                   accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt,.jpg,.jpeg,.png,.gif,.webp">
+                        </div>
+
+                        <!-- Upload Progress Bar -->
+                        <div class="upload-progress" id="uploadProgress-${this.thesisId}" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill-${this.thesisId}"></div>
+                            </div>
+                            <div class="progress-text" id="progressText-${this.thesisId}">Μεταφόρτωση...</div>
+                        </div>
+
+                        <!-- File List Display -->
+                        <div class="file-list-container">
+                            <div class="file-list-header">
+                                <span class="file-count">Αρχεία (<span id="fileCount-${this.thesisId}">0</span>)</span>
+                                <button class="refresh-btn" onclick="window.thesisFileManager_${this.thesisId}.loadFiles()">
+                                    🔄 Ανανέωση
+                                </button>
+                            </div>
+                            <div class="file-list" id="fileList-${this.thesisId}">
+                                <!-- Files will be dynamically loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            /*
+             * Initialize all the interactive functionality for this file manager
+             * This is where we connect all the user interface elements to their functionality
+             */
+            initialize() {
+                // Set up the file input change handler
+                const fileInput = document.getElementById(`fileInput-${this.thesisId}`);
+                if (fileInput) {
+                    fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                }
+
+                // Set up drag and drop functionality
+                const uploadArea = document.getElementById(`uploadArea-${this.thesisId}`);
+                if (uploadArea) {
+                    uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+                    uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                    uploadArea.addEventListener('drop', (e) => this.handleFileDrop(e));
+                }
+
+                // Load existing files for this thesis
+                this.loadFiles();
+            }
+
+            /*
+             * Handle file selection from the file input dialog
+             * This method processes files whether they come from clicking or drag-and-drop
+             */
+            handleFileSelect(event) {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    this.uploadFiles(Array.from(files));
+                }
+            }
+
+            // Drag and drop event handlers for better user experience
+            handleDragOver(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const uploadArea = document.getElementById(`uploadArea-${this.thesisId}`);
+                uploadArea.classList.add('dragover');
+            }
+
+            handleDragLeave(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const uploadArea = document.getElementById(`uploadArea-${this.thesisId}`);
+                uploadArea.classList.remove('dragover');
+            }
+
+            handleFileDrop(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                const uploadArea = document.getElementById(`uploadArea-${this.thesisId}`);
+                uploadArea.classList.remove('dragover');
+                
+                const files = Array.from(event.dataTransfer.files);
+                if (files.length > 0) {
+                    this.uploadFiles(files);
+                }
+            }
+
+            /*
+             * Upload files to the server with progress tracking
+             * This is the core functionality that communicates with your backend API
+             */
+            async uploadFiles(files) {
+                if (this.uploadInProgress) {
+                    showMessage('Μια μεταφόρτωση είναι ήδη σε εξέλιξη', 'warning');
+                    return;
+                }
+
+                // Validate file count (maximum 5 files as per your backend configuration)
+                if (files.length > 5) {
+                    showMessage('Μπορείτε να ανεβάσετε μέχρι 5 αρχεία ταυτόχρονα', 'error');
+                    return;
+                }
+
+                this.uploadInProgress = true;
+                this.showProgress(true);
+
+                try {
+                    // Create FormData object to send files to the server
+                    const formData = new FormData();
+                    files.forEach(file => {
+                        formData.append('files', file);
+                    });
+
+                    // Make the API call to your backend
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(`Επιτυχής μεταφόρτωση ${files.length} αρχείων`, 'success');
+                        this.loadFiles(); // Reload the file list to show new files
+                        
+                        // Clear the file input for next use
+                        const fileInput = document.getElementById(`fileInput-${this.thesisId}`);
+                        if (fileInput) fileInput.value = '';
+                    } else {
+                        throw new Error(result.message || 'Αποτυχία μεταφόρτωσης');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    showMessage(`Σφάλμα κατά τη μεταφόρτωση: ${error.message}`, 'error');
+                } finally {
+                    this.uploadInProgress = false;
+                    this.showProgress(false);
+                }
+            }
+
+            /*
+             * Load and display existing files for this thesis
+             * This method fetches the current file list from your backend
+             */
+            async loadFiles() {
+                try {
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/files`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.files = result.files || [];
+                        this.renderFileList();
+                        this.updateFileCount();
+                    } else {
+                        console.error('Failed to load files:', result.message);
+                        showMessage('Αποτυχία φόρτωσης αρχείων', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error loading files:', error);
+                    showMessage('Σφάλμα κατά τη φόρτωση αρχείων', 'error');
+                }
+            }
+
+            /*
+             * Render the file list in the user interface
+             * This creates the visual representation of all files for this thesis
+             */
+            renderFileList() {
+                const fileList = document.getElementById(`fileList-${this.thesisId}`);
+                if (!fileList) return;
+
+                if (this.files.length === 0) {
+                    fileList.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">📁</div>
+                            <p>Δεν υπάρχουν αρχεία για αυτή τη διπλωματική εργασία</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Create HTML for each file
+                const filesHtml = this.files.map(file => `
+                    <div class="file-item" data-file-id="${file.id}">
+                        <div class="file-info">
+                            <div class="file-icon">${this.getFileIcon(file.file_type)}</div>
+                            <div class="file-details">
+                                <div class="file-name">${file.file_name}</div>
+                                <div class="file-meta">
+                                    Μεταφορτώθηκε: ${this.formatDate(file.uploaded_at)} • 
+                                    Τύπος: ${file.file_type}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="file-action download" onclick="window.thesisFileManager_${this.thesisId}.downloadFile(${file.id})" title="Κατέβασμα">
+                                💾 Κατέβασμα
+                            </button>
+                            <button class="file-action delete" onclick="window.thesisFileManager_${this.thesisId}.deleteFile(${file.id})" title="Διαγραφή">
+                                🗑️ Διαγραφή
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                fileList.innerHTML = filesHtml;
+            }
+
+            /*
+             * Download a specific file
+             * This creates a download link and triggers the download
+             */
+            async downloadFile(fileId) {
+                try {
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/files/${fileId}/download`);
+                    
+                    if (response.ok) {
+                        // Get the filename from the response headers
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        let filename = 'download';
+                        
+                        if (contentDisposition) {
+                            const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                            if (filenameMatch) {
+                                filename = filenameMatch[1];
+                            }
+                        }
+
+                        // Create blob and download link
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        showMessage('Το αρχείο κατέβηκε επιτυχώς', 'success');
+                    } else {
+                        throw new Error('Αποτυχία κατεβάσματος αρχείου');
+                    }
+                } catch (error) {
+                    console.error('Download error:', error);
+                    showMessage(`Σφάλμα κατά το κατέβασμα: ${error.message}`, 'error');
+                }
+            }
+
+            /*
+             * Delete a file with confirmation
+             * This removes a file from both the server and the interface
+             */
+            async deleteFile(fileId) {
+                // Ask for confirmation before deleting
+                if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτό το αρχείο;')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/files/thesis/${this.thesisId}/files/${fileId}`, {
+                        method: 'DELETE'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage('Το αρχείο διαγράφηκε επιτυχώς', 'success');
+                        this.loadFiles(); // Reload the file list
+                    } else {
+                        throw new Error(result.message || 'Αποτυχία διαγραφής αρχείου');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    showMessage(`Σφάλμα κατά τη διαγραφή: ${error.message}`, 'error');
+                }
+            }
+
+            // Helper method to show/hide upload progress
+            showProgress(show, progress = 0) {
+                const progressContainer = document.getElementById(`uploadProgress-${this.thesisId}`);
+                const progressFill = document.getElementById(`progressFill-${this.thesisId}`);
+                const progressText = document.getElementById(`progressText-${this.thesisId}`);
+
+                if (progressContainer) {
+                    progressContainer.style.display = show ? 'block' : 'none';
+                }
+
+                if (show && progressFill) {
+                    progressFill.style.width = `${progress}%`;
+                }
+
+                if (show && progressText) {
+                    progressText.textContent = progress > 0 ? `Μεταφόρτωση... ${progress}%` : 'Μεταφόρτωση...';
+                }
+            }
+
+            // Helper method to update the file count display
+            updateFileCount() {
+                const fileCountElement = document.getElementById(`fileCount-${this.thesisId}`);
+                if (fileCountElement) {
+                    fileCountElement.textContent = this.files.length;
+                }
+            }
+
+            // Helper method to get appropriate icon for file type
+            getFileIcon(fileType) {
+                const iconMap = {
+                    'application/pdf': '📄',
+                    'application/msword': '📝',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '📝',
+                    'application/vnd.ms-powerpoint': '📊',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '📊',
+                    'application/vnd.ms-excel': '📈',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '📈',
+                    'application/zip': '🗜️',
+                    'text/plain': '📄',
+                    'image/jpeg': '🖼️',
+                    'image/png': '🖼️',
+                    'image/gif': '🖼️',
+                    'image/webp': '🖼️'
+                };
+                return iconMap[fileType] || '📁';
+            }
+
+            // Helper method to format dates nicely
+            formatDate(dateString) {
+                if (!dateString) return 'Άγνωστη ημερομηνία';
+                return new Date(dateString).toLocaleDateString('el-GR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        /*
+         * FACTORY FUNCTION TO CREATE FILE MANAGERS
+         * This function creates and initializes a file manager for a specific thesis
+         * It's designed to be called from anywhere in your application
+         */
+        function createThesisFileManager(thesisId, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!container) {
+                console.error(`Container ${containerId} not found for thesis ${thesisId}`);
+                return null;
+            }
+
+            // Create the file manager instance
+            const fileManager = new ThesisFileManager(thesisId);
+            
+            // Add HTML to container
+            container.innerHTML = fileManager.createFileUploadHTML();
+            
+            // Make file manager globally accessible with unique name
+            // This allows us to call methods on specific file managers
+            window[`thesisFileManager_${thesisId}`] = fileManager;
+            
+            // Initialize functionality after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                fileManager.initialize();
+            }, 100);
+            
+            return fileManager;
+        }
+
+        /*
+         * MAIN APPLICATION FUNCTIONS
+         * These functions handle the overall application functionality
+         */
+
+        // Initialize the professor dashboard when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Professor Dashboard Initializing...');
+            initializeProfessorDashboard();
+        });
+
+        // Main initialization function
+        async function initializeProfessorDashboard() {
+            try {
+                // Check if user is authenticated
+                const userResponse = await fetch('/api/auth/me');
+                if (!userResponse.ok) {
+                    // Redirect to login if not authenticated
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const userData = await userResponse.json();
+                ProfessorApp.currentUser = userData.user;
+
+                // Load initial data
+                await loadDashboardData();
+                
+                console.log('✅ Professor Dashboard Initialized Successfully');
+            } catch (error) {
+                console.error('❌ Dashboard initialization error:', error);
+                showMessage('Σφάλμα κατά την αρχικοποίηση του συστήματος', 'error');
+            }
+        }
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/professor/dashboard');
+                const result = await response.json();
+
+                if (result.success) {
+                    ProfessorApp.data = result.data;
+                    updateStatistics(result.data.statistics);
+                    console.log('📊 Dashboard data loaded successfully');
+                } else {
+                    throw new Error(result.message || 'Failed to load dashboard data');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showMessage('Αποτυχία φόρτωσης δεδομένων', 'error');
+            }
+        }
+
+        // Update statistics display
+        function updateStatistics(stats) {
+            if (!stats) return;
+
+            document.getElementById('totalSupervised').textContent = stats.totalSupervised || 0;
+            document.getElementById('activeTheses').textContent = stats.activeTheses || 0;
+            document.getElementById('completedTheses').textContent = stats.completedTheses || 0;
+            document.getElementById('committeeParticipations').textContent = stats.committeeParticipations || 0;
+        }
+
+        /*
+         * TAB NAVIGATION FUNCTIONS
+         * These handle switching between different views in the dashboard
+         */
+        function switchTab(tabName) {
+            console.log('🔄 Switching to tab:', tabName);
+
+            // Update navigation buttons
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data for the selected tab
+            ProfessorApp.currentTab = tabName;
+            
+            switch(tabName) {
+                case 'overview':
+                    // Overview data is already loaded
+                    break;
+                case 'supervised':
+                    loadSupervisedTheses();
+                    break;
+                case 'committee':
+                    loadCommitteeParticipation();
+                    break;
+                case 'topics':
+                    loadThesisTopics();
+                    break;
+            }
+        }
+
+        /*
+         * DATA LOADING FUNCTIONS FOR EACH TAB
+         * These functions load specific data when tabs are activated
+         */
+        async function loadSupervisedTheses() {
+            const content = document.getElementById('supervisedTheses');
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Φόρτωση επιβλεπόμενων εργασιών...
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/professor/supervised-theses');
+                const result = await response.json();
+
+                if (result.success && result.theses && result.theses.length > 0) {
+                    renderSupervisedTheses(result.theses);
+                } else {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📚</div>
+                            <p>Δεν επιβλέπετε κάποια διπλωματική εργασία αυτή τη στιγμή</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading supervised theses:', error);
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <p>Σφάλμα κατά τη φόρτωση των επιβλεπόμενων εργασιών</p>
+                    </div>
+                `;
+            }
+        }
+
+        /*
+         * RENDER SUPERVISED THESES WITH FILE MANAGERS
+         * This is where we create the thesis list and initialize file managers for each
+         */
+        function renderSupervisedTheses(theses) {
+            const content = document.getElementById('supervisedTheses');
+            
+            const thesesHtml = theses.map(thesis => `
+                <div class="thesis-item" data-thesis-id="${thesis.id}">
+                    <div class="thesis-header">
+                        <div class="thesis-title">${thesis.title}</div>
+                        <div class="thesis-status status-${thesis.status.replace('_', '-')}">
+                            ${getStatusText(thesis.status)}
+                        </div>
+                    </div>
+                    <div class="student-info">
+                        Φοιτητής: ${thesis.student_name} (${thesis.student_number || 'N/A'})
+                    </div>
+                    
+                    <div class="thesis-actions">
+                        <button class="action-btn secondary" onclick="addNote(${thesis.id})">
+                            📝 Σημείωση
+                        </button>
+                        <button class="action-btn secondary" onclick="viewProgress(${thesis.id})">
+                            📊 Πρόοδος
+                        </button>
+                        <button class="action-btn" onclick="toggleFileManager(${thesis.id})">
+                            📁 Αρχεία
+                        </button>
+                    </div>
+                    
+                    <!-- File Manager Section for this thesis -->
+                    <div class="thesis-file-section" id="professorFileManager-${thesis.id}" style="display: none;">
+                        <!-- File manager will be inserted here -->
+                    </div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = thesesHtml;
+            
+            // Initialize file managers for all theses but keep them hidden initially
+            theses.forEach(thesis => {
+                // Use setTimeout to ensure DOM elements are ready
+                setTimeout(() => {
+                    createThesisFileManager(thesis.id, `professorFileManager-${thesis.id}`);
+                }, 100);
+            });
+        }
+
+        /*
+         * TOGGLE FILE MANAGER VISIBILITY
+         * This function shows/hides the file manager for a specific thesis
+         */
+        function toggleFileManager(thesisId) {
+            const fileManagerContainer = document.getElementById(`professorFileManager-${thesisId}`);
+            
+            if (!fileManagerContainer) {
+                console.error(`File manager container not found for thesis ${thesisId}`);
+                return;
+            }
+
+            const isCurrentlyVisible = fileManagerContainer.style.display === 'block';
+            
+            if (isCurrentlyVisible) {
+                // Hide the file manager
+                fileManagerContainer.style.display = 'none';
+            } else {
+                // Show the file manager and load files
+                fileManagerContainer.style.display = 'block';
+                
+                // If the file manager exists, reload its files
+                const fileManager = window[`thesisFileManager_${thesisId}`];
+                if (fileManager) {
+                    fileManager.loadFiles();
+                }
+            }
+        }
+
+        // Load committee participation data
+        async function loadCommitteeParticipation() {
+            const content = document.getElementById('committeeParticipation');
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Φόρτωση επιτροπών...
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/professor/committee-participation');
+                const result = await response.json();
+
+                if (result.success && result.committees && result.committees.length > 0) {
+                    const committeesHtml = result.committees.map(committee => `
+                        <div class="thesis-item">
+                            <div class="thesis-header">
+                                <div class="thesis-title">${committee.thesis_title}</div>
+                                <div class="thesis-status status-${committee.status.replace('_', '-')}">
+                                    ${getStatusText(committee.status)}
+                                </div>
+                            </div>
+                            <div class="student-info">
+                                Επιβλέπων: ${committee.supervisor_name} • 
+                                Ρόλος: ${getRoleText(committee.role)} •
+                                Φοιτητής: ${committee.student_name}
+                            </div>
+                            <div class="thesis-actions">
+                                <button class="action-btn secondary" onclick="viewThesisDetails(${committee.thesis_id})">
+                                    👁️ Προβολή
+                                </button>
+                                <button class="action-btn" onclick="toggleFileManager(${committee.thesis_id})">
+                                    📁 Αρχεία
+                                </button>
+                            </div>
+                            
+                            <!-- File Manager for committee thesis -->
+                            <div class="thesis-file-section" id="professorFileManager-${committee.thesis_id}" style="display: none;">
+                                <!-- File manager will be inserted here -->
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    content.innerHTML = committeesHtml;
+                    
+                    // Initialize file managers for committee theses
+                    result.committees.forEach(committee => {
+                        setTimeout(() => {
+                            createThesisFileManager(committee.thesis_id, `professorFileManager-${committee.thesis_id}`);
+                        }, 100);
+                    });
+                } else {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">👥</div>
+                            <p>Δεν συμμετέχετε σε κάποια επιτροπή αυτή τη στιγμή</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading committee participation:', error);
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <p>Σφάλμα κατά τη φόρτωση των επιτροπών</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load thesis topics
+        async function loadThesisTopics() {
+            const content = document.getElementById('thesisTopics');
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Φόρτωση θεμάτων...
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/professor/thesis-topics');
+                const result = await response.json();
+
+                if (result.success && result.topics && result.topics.length > 0) {
+                    const topicsHtml = result.topics.map(topic => `
+                        <div class="thesis-item">
+                            <div class="thesis-header">
+                                <div class="thesis-title">${topic.title}</div>
+                                <div class="thesis-status ${topic.is_available ? 'status-active' : 'status-under-assignment'}">
+                                    ${topic.is_available ? 'Διαθέσιμο' : 'Μη Διαθέσιμο'}
+                                </div>
+                            </div>
+                            <div class="student-info">
+                                ${topic.description}
+                            </div>
+                            <div class="thesis-actions">
+                                <button class="action-btn secondary" onclick="editTopic(${topic.id})">
+                                    ✏️ Επεξεργασία
+                                </button>
+                                <button class="action-btn ${topic.is_available ? 'secondary' : ''}" 
+                                        onclick="toggleTopicAvailability(${topic.id}, ${topic.is_available})">
+                                    ${topic.is_available ? '🔒 Απενεργοποίηση' : '🔓 Ενεργοποίηση'}
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    content.innerHTML = `
+                        <div class="thesis-actions" style="margin-bottom: 1.5rem;">
+                            <button class="action-btn" onclick="createNewTopic()">
+                                ➕ Νέο Θέμα
+                            </button>
+                        </div>
+                        ${topicsHtml}
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">💡</div>
+                            <p>Δεν έχετε δημιουργήσει κάποιο θέμα διπλωματικής εργασίας</p>
+                            <button class="btn" onclick="createNewTopic()">
+                                ➕ Δημιουργία Νέου Θέματος
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading thesis topics:', error);
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <p>Σφάλμα κατά τη φόρτωση των θεμάτων</p>
+                    </div>
+                `;
+            }
+        }
+
+        /*
+         * UTILITY FUNCTIONS
+         * These functions provide common functionality used throughout the application
+         */
+
+        // Get human-readable status text
+        function getStatusText(status) {
+            const statusMap = {
+                'under_assignment': 'Υπό Ανάθεση',
+                'active': 'Ενεργή',
+                'under_examination': 'Υπό Εξέταση',
+                'completed': 'Ολοκληρωμένη',
+                'cancelled': 'Ακυρωμένη'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Get human-readable role text
+        function getRoleText(role) {
+            const roleMap = {
+                'supervisor': 'Επιβλέπων',
+                'member': 'Μέλος Επιτροπής'
+            };
+            return roleMap[role] || role;
+        }
+
+        /*
+         * ACTION FUNCTIONS
+         * These functions handle specific user actions
+         */
+
+        // Add note to thesis
+        function addNote(thesisId) {
+            const note = prompt('Προσθέστε μια σημείωση για αυτή τη διπλωματική:');
+            if (note && note.trim()) {
+                // Here you would make an API call to save the note
+                showMessage('Η σημείωση προστέθηκε (λειτουργία υπό ανάπτυξη)', 'info');
+            }
+        }
+
+        // View thesis progress
+        function viewProgress(thesisId) {
+            showMessage('Προβολή προόδου - λειτουργία υπό ανάπτυξη', 'info');
+        }
+
+        // View thesis details
+        function viewThesisDetails(thesisId) {
+            showMessage('Προβολή λεπτομερειών - λειτουργία υπό ανάπτυξη', 'info');
+        }
+
+        // Edit topic
+        function editTopic(topicId) {
+            showMessage('Επεξεργασία θέματος - λειτουργία υπό ανάπτυξη', 'info');
+        }
+
+        // Toggle topic availability
+        function toggleTopicAvailability(topicId, currentStatus) {
+            const action = currentStatus ? 'απενεργοποιήσετε' : 'ενεργοποιήσετε';
+            if (confirm(`Είστε σίγουροι ότι θέλετε να ${action} αυτό το θέμα;`)) {
+                showMessage('Αλλαγή διαθεσιμότητας - λειτουργία υπό ανάπτυξη', 'info');
+            }
+        }
+
+        // Create new topic
+        function createNewTopic() {
+            showMessage('Δημιουργία νέου θέματος - λειτουργία υπό ανάπτυξη', 'info');
+        }
+
+        // View profile
+        function viewProfile() {
+            showMessage('Προβολή προφίλ - λειτουργία υπό ανάπτυξη', 'info');
+        }
+
+        // Logout function
+        async function logout() {
+            if (confirm('Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;')) {
+                try {
+                    await fetch('/api/auth/logout', { method: 'POST' });
+                    window.location.href = '/login.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    showMessage('Σφάλμα κατά την αποσύνδεση', 'error');
+                }
+            }
+        }
+
+        /*
+         * MESSAGE SYSTEM
+         * This system shows notifications to users
+         */
+        function showMessage(text, type = 'info') {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+
+            // Create new toast
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">
+                        ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
+                    </span>
+                    <span>${text}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
+        }
+
+        // Initialize dynamic CSS injection for the file manager component
+        const fileManagerCSS = `
+            /* Additional CSS for file manager styling is already included in the main styles above */
+        `;
+
+        // Inject CSS if not already present
+        if (!document.getElementById('fileManagerStyles')) {
+            const style = document.createElement('style');
+            style.id = 'fileManagerStyles';
+            style.textContent = fileManagerCSS;
+            document.head.appendChild(style);
+        }
+
+        console.log('📁 File Manager System Loaded Successfully');
+    </script>
+</body>
+</html>

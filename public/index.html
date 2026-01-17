@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Σύστημα Διαχείρισης Διπλωματικών Εργασιών - ΤΜΗΥΠ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .welcome-text {
+            color: #666;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* User Type Selection */
+        .user-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .user-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-title {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .user-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Login Form */
+        .login-form {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Info Sections */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f2f5;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-number {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            text-align: center;
+            color: #666;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #764ba2;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content-box {
+                padding: 2rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .user-selection {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">📚 ΤΜΗΥΠ</div>
+                <div class="subtitle">Τμήμα Μηχανικών Η/Υ & Πληροφορικής</div>
+            </div>
+            <div class="header-info">
+                <span>Πανεπιστήμιο Πατρών</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="content-box">
+            <!-- Initial Welcome Screen -->
+            <div id="welcomeScreen">
+                <h1 class="welcome-title">Σύστημα Διαχείρισης Διπλωματικών Εργασιών</h1>
+                <p class="welcome-text">
+                    Καλώς ήρθατε στο σύστημα υποστήριξης διπλωματικών εργασιών του Τμήματος Μηχανικών Η/Υ & Πληροφορικής.
+                    Επιλέξτε τον τύπο χρήστη για να συνεχίσετε.
+                </p>
+
+                <!-- User Type Selection -->
+                <div class="user-selection">
+                    <div class="user-card" onclick="showLoginForm('student')">
+                        <div class="user-icon">🎓</div>
+                        <div class="user-title">Φοιτητής</div>
+                        <div class="user-description">
+                            Διαχείριση διπλωματικής, υποβολή αρχείων, παρακολούθηση προόδου
+                        </div>
+                    </div>
+
+                    <div class="user-card" onclick="showLoginForm('professor')">
+                        <div class="user-icon">👨‍🏫</div>
+                        <div class="user-title">Καθηγητής</div>
+                        <div class="user-description">
+                            Επίβλεψη διπλωματικών, διαχείριση θεμάτων, αξιολόγηση
+                        </div>
+                    </div>
+
+                    <div class="user-card" onclick="showLoginForm('secretary')">
+                        <div class="user-icon">📋</div>
+                        <div class="user-title">Γραμματεία</div>
+                        <div class="user-description">
+                            Διοικητική διαχείριση, στατιστικά, εισαγωγή δεδομένων
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Statistics -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-number" id="activeThesesCount">-</div>
+                        <div class="info-label">Ενεργές Διπλωματικές</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-number" id="professorsCount">-</div>
+                        <div class="info-label">Καθηγητές</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-number" id="studentsCount">-</div>
+                        <div class="info-label">Φοιτητές</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-number" id="completedCount">-</div>
+                        <div class="info-label">Ολοκληρωμένες</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Form (Hidden by default) -->
+            <div id="loginForm" class="login-form">
+                <h2 class="form-title" id="loginTitle">Σύνδεση</h2>
+                
+                <!-- Alert Messages -->
+                <div id="alertMessage" class="alert"></div>
+
+                <form id="authForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Όνομα Χρήστη</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-input" 
+                            required
+                            placeholder="Εισάγετε το όνομα χρήστη"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Κωδικός Πρόσβασης</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            required
+                            placeholder="Εισάγετε τον κωδικό πρόσβασης"
+                        />
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary" onclick="backToWelcome()">
+                            Πίσω
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Σύνδεση
+                        </button>
+                    </div>
+                </form>
+
+                <input type="hidden" id="userType" value="">
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/api/public/announcements" class="footer-link">Δημόσιες Ανακοινώσεις</a>
+            <a href="/test-auth.html" class="footer-link">Developer Login</a>
+            <a href="/api/public/health" class="footer-link">System Status</a>
+        </div>
+        <div>© 2025 Πανεπιστήμιο Πατρών - ΤΜΗΥΠ | Version 1.0.0</div>
+    </footer>
+
+    <script>
+        // Global state
+        let currentUserType = null;
+
+        // Show login form for selected user type
+        function showLoginForm(userType) {
+            currentUserType = userType;
+            document.getElementById('userType').value = userType;
+            
+            // Update login title based on user type
+            const titles = {
+                'student': 'Σύνδεση Φοιτητή',
+                'professor': 'Σύνδεση Καθηγητή',
+                'secretary': 'Σύνδεση Γραμματείας'
+            };
+            document.getElementById('loginTitle').textContent = titles[userType];
+            
+            // Hide welcome screen and show login form
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('loginForm').classList.add('active');
+            
+            // Clear any previous messages
+            hideAlert();
+        }
+
+        // Back to welcome screen
+        function backToWelcome() {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('authForm').reset();
+            hideAlert();
+        }
+
+        // Handle login form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            
+            try {
+                // Call authentication API
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store authentication token
+                    if (data.token) {
+                        localStorage.setItem('authToken', data.token);
+                    }
+                    
+                    // Check if user type matches
+                    if (data.user.user_type !== userType) {
+                        showAlert('Ο τύπος χρήστη δεν ταιριάζει με τα στοιχεία σύνδεσης', 'error');
+                        return;
+                    }
+                    
+                    showAlert('Επιτυχής σύνδεση! Ανακατεύθυνση...', 'success');
+                    
+                    // Redirect based on user type
+                    setTimeout(() => {
+                        switch(data.user.user_type) {
+                            case 'student':
+                                window.location.href = '/student-dashboard.html';
+                                break;
+                            case 'professor':
+                                window.location.href = '/professor-dashboard.html';
+                                break;
+                            case 'secretary':
+                                window.location.href = '/secretary-dashboard.html';
+                                break;
+                            default:
+                                window.location.href = '/';
+                        }
+                    }, 1500);
+                    
+                } else {
+                    showAlert(data.message || 'Σφάλμα σύνδεσης', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Σφάλμα επικοινωνίας με τον διακομιστή', 'error');
+            }
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type} active`;
+        }
+
+        // Hide alert message
+        function hideAlert() {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.className = 'alert';
+        }
+
+        // Load statistics on page load
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/public/statistics');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update statistics display
+                    document.getElementById('activeThesesCount').textContent = 
+                        data.general?.active_theses || '0';
+                    document.getElementById('completedCount').textContent = 
+                        data.general?.total_completed || '0';
+                    
+                    // These would need separate API calls or additions to the statistics endpoint
+                    document.getElementById('professorsCount').textContent = '15';
+                    document.getElementById('studentsCount').textContent = '120';
+                }
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+        });
+    </script>
+</body>
+</html>

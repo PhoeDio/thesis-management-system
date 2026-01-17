@@ -1,0 +1,23 @@
+# Handle line endings consistently
+* text=auto
+
+# JavaScript and Node
+*.js     text eol=lf
+*.json   text eol=lf
+
+# HTML, CSS
+*.html   text eol=lf
+*.css    text eol=lf
+
+# Config files
+*.env    text eol=lf
+*.sql    text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+
+# PHP
+*.php    text eol=lf
+
+# Ignore node_modules (already in .gitignore but just in case)
+node_modules/* -text
